@@ -7,13 +7,19 @@ import (
 	"net/url"
 )
 
+const (
+	paizaURL = "http://api.paiza.io:80/runners/"
+	createPath = "create"
+	detailPath = "get_details"
+)
+
 func main() {
 	values := url.Values{}
 	values.Add("language", "swift")
 	values.Add("api_key", "guest")
 	values.Add("source_code", "print(114514)")
 
-	resp, err := http.PostForm("http://api.paiza.io:80/runners/create", values)
+	resp, err := http.PostForm(paizaURL + createPath, values)
 	if err != nil {
 		fmt.Println(err)
 		return
