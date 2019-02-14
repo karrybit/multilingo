@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -12,6 +13,12 @@ const (
 	createPath = "create"
 	detailPath = "get_details"
 )
+
+// TODO: naming
+type CreateResponse struct {
+	ID string `json:"id"`
+	Status string `json:"status"`
+}
 
 func main() {
 	values := url.Values{}
@@ -26,8 +33,14 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	b, err := ioutil.ReadAll(resp.Body)
-	if err == nil {
-		fmt.Println(string(b))
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
 	}
+
+	// TODO: naming
+	var cResp CreateResponse
+	json.Unmarshal(bytes, &cResp)
+
+	fmt.Println(cResp)
 }
