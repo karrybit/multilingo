@@ -1,44 +1,44 @@
 package main
 
 import (
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 const (
-	paizaURL = "http://api.paiza.io:80/runners/"
+	paizaURL   = "http://api.paiza.io:80/runners/"
 	createPath = "create"
 	detailPath = "get_details"
 )
 
 // TODO: naming
 type CreateResponse struct {
-	ID string `json:"id"`
+	ID     string `json:"id"`
 	Status string `json:"status"`
 }
 
 type DetailResponse struct {
-	ID string `json:"id"`
-	Language string `json:"language"`
-	Note string `json:"note"`
-	Status string `json:"status"`
-	Build_stdout string `json:"build_stdout"`
-	Build_stderr string `json:"build_stderr"`
-	Build_exit_code int `json:"build_exit_code"`
-	Build_time string `json:"build_time"`
-	Build_memory int `json:"build_memory"`
-	Build_result string `json:"build_result"`
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
-	Exit_code int `json:"exit_code"`
-	Time string `json:"time"`
-	Memory int `json:"memory"`
-	Connections int `json:"connections"`
-	Result string `json:"result"`
+	ID              string `json:"id"`
+	Language        string `json:"language"`
+	Note            string `json:"note"`
+	Status          string `json:"status"`
+	Build_stdout    string `json:"build_stdout"`
+	Build_stderr    string `json:"build_stderr"`
+	Build_exit_code int    `json:"build_exit_code"`
+	Build_time      string `json:"build_time"`
+	Build_memory    int    `json:"build_memory"`
+	Build_result    string `json:"build_result"`
+	Stdout          string `json:"stdout"`
+	Stderr          string `json:"stderr"`
+	Exit_code       int    `json:"exit_code"`
+	Time            string `json:"time"`
+	Memory          int    `json:"memory"`
+	Connections     int    `json:"connections"`
+	Result          string `json:"result"`
 }
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	values.Add("api_key", "guest")
 	values.Add("source_code", "print(114514)")
 
-	resp, err := http.PostForm(paizaURL + createPath, values)
+	resp, err := http.PostForm(paizaURL+createPath, values)
 	if err != nil {
 		fmt.Println(err)
 		return
