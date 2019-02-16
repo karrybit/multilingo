@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
@@ -13,20 +12,34 @@ func main() {
 	// TODO: add after parse
 	query["source_code"] = "print(114514)"
 	query["api_key"] = "guest"
-	createResponse, err := request.CreateID(query)
-	if err != nil {
-		fmt.Println(err)
+
+	// --- REQUEST ---
+	createChannel := make(chan request.CreateIDResult)
+	go request.CreateID(query, createChannel)
+
+	// --- LOG ---
+	fmt.Println("⚙️  pre <-createChannel")
+	createResult := <-createChannel
+	fmt.Println("️⚙️  post <-createChannel")
+
+	// --- ERROR ---
+	if createResult.Err != nil {
+		fmt.Println(createResult.Err)
 		return
 	}
-	fmt.Printf("%v\n", *createResponse)
 
-	// TODO: goroutin使う
-	time.Sleep(2 * time.Second)
+	// --- REQUEST ---
+	detailChannel := make(chan request.GetDetailsResult)
+	go request.GetDetails(map[string]string{"id": createResult.Response.ID, "api_key": "guest"}, detailChannel)
 
-	detailsResponse, err := request.GetDetails(map[string]string{"id": createResponse.ID, "api_key": "guest"})
-	if err != nil {
-		fmt.Println(err)
+	// --- LOG ---
+	fmt.Println("️⚙️  pre <-detailChannel")
+	detailResult := <-detailChannel
+	fmt.Println("⚙️  post <-detailChannel")
+
+	// --- ERROR ---
+	if detailResult.Err != nil {
+		fmt.Println(detailResult.Err)
 		return
 	}
-	fmt.Printf("%v\n", *detailsResponse)
 }
