@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/TakumiKaribe/MultilinGo/Log"
+	"github.com/TakumiKaribe/MultilinGo/log"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	Log.PrintFields(&createResult.Response)
+	log.PrintFields(&createResult.Response)
 
 	// --- REQUEST ---
 	detailChannel := make(chan request.GetDetailsResult)
@@ -40,5 +40,5 @@ func main() {
 		return
 	}
 
-	Log.PrintFields(&detailResult.Response)
+	log.PrintFields(&detailResult.Response)
 }
