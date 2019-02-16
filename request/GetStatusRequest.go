@@ -9,6 +9,7 @@ import (
 	"github.com/TakumiKaribe/MultilinGo/model"
 )
 
+// GetStatusRequest is request to get execution status
 func GetStatusRequest(query map[string]string, ch chan<- StatusResult) {
 	values := url.Values{}
 	for k, v := range query {

@@ -1,5 +1,6 @@
 package model
 
+// ExecutionResult -
 type ExecutionResult struct {
 	ID            string `json:"id"`
 	Language      string `json:"language"`
@@ -20,4 +21,5 @@ type ExecutionResult struct {
 	Result        string `json:"result"`
 }
 
+// Log is standard output of all properties
 func (dr *ExecutionResult) Log() {}

@@ -9,11 +9,13 @@ import (
 	"github.com/TakumiKaribe/MultilinGo/model"
 )
 
+// StatusResult -
 type StatusResult struct {
 	Response model.Status
 	Err      error
 }
 
+// ExecProgramRequest is request to execute program
 func ExecProgramRequest(query map[string]string, ch chan<- StatusResult) {
 	values := url.Values{}
 	for k, v := range query {

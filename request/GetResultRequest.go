@@ -9,11 +9,13 @@ import (
 	"github.com/TakumiKaribe/MultilinGo/model"
 )
 
+// ExecutionResult -
 type ExecutionResult struct {
 	Response model.ExecutionResult
 	Err      error
 }
 
+// GetResultRequest is request to get execution result
 func GetResultRequest(query map[string]string, ch chan<- ExecutionResult) {
 	values := url.Values{}
 	for k, v := range query {
