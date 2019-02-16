@@ -41,8 +41,6 @@ func CreateID(query map[string]string, ch chan<- CreateIDResult) {
 	var createResponse model.CreateResponse
 	json.Unmarshal(bytes, &createResponse)
 
-	fmt.Printf("📦  %v\n", createResponse)
-
 	result.Response = createResponse
 	fmt.Println("⚙️  ch <- CreateIDResult")
 	ch <- result

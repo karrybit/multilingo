@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/TakumiKaribe/MultilinGo/Log"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
@@ -28,6 +29,8 @@ func main() {
 		return
 	}
 
+	Log.PrintFields(&createResult.Response)
+
 	// --- REQUEST ---
 	detailChannel := make(chan request.GetDetailsResult)
 	go request.GetDetails(map[string]string{"id": createResult.Response.ID, "api_key": "guest"}, detailChannel)
@@ -42,4 +45,6 @@ func main() {
 		fmt.Println(detailResult.Err)
 		return
 	}
+
+	Log.PrintFields(&detailResult.Response)
 }

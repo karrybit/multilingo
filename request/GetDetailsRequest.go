@@ -42,8 +42,6 @@ func GetDetails(query map[string]string, ch chan<- GetDetailsResult) {
 	var detailResponse model.DetailResponse
 	json.Unmarshal(bytes, &detailResponse)
 
-	fmt.Printf("📦  %v\n", detailResponse)
-
 	result.Response = detailResponse
 	fmt.Println("⚙️  ch <- GetDetailsResult")
 	ch <- result
