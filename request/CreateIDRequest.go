@@ -24,7 +24,7 @@ func CreateID(query map[string]string, ch chan<- CreateIDResult) {
 	result := CreateIDResult{}
 
 	resp, err := http.PostForm(baseURL+createPath, values)
-	fmt.Printf("⚡️  %s\n", resp.Request.URL)
+	fmt.Printf("\n⚡️  %s\n\n", resp.Request.URL)
 	if err != nil {
 		result.Err = err
 		ch <- result
@@ -42,6 +42,5 @@ func CreateID(query map[string]string, ch chan<- CreateIDResult) {
 	json.Unmarshal(bytes, &createResponse)
 
 	result.Response = createResponse
-	fmt.Println("⚙️  ch <- CreateIDResult")
 	ch <- result
 }

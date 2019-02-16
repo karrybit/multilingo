@@ -18,10 +18,7 @@ func main() {
 	createChannel := make(chan request.CreateIDResult)
 	go request.CreateID(query, createChannel)
 
-	// --- LOG ---
-	fmt.Println("⚙️  pre <-createChannel")
 	createResult := <-createChannel
-	fmt.Println("️⚙️  post <-createChannel")
 
 	// --- ERROR ---
 	if createResult.Err != nil {
@@ -35,10 +32,7 @@ func main() {
 	detailChannel := make(chan request.GetDetailsResult)
 	go request.GetDetails(map[string]string{"id": createResult.Response.ID, "api_key": "guest"}, detailChannel)
 
-	// --- LOG ---
-	fmt.Println("️⚙️  pre <-detailChannel")
 	detailResult := <-detailChannel
-	fmt.Println("⚙️  post <-detailChannel")
 
 	// --- ERROR ---
 	if detailResult.Err != nil {

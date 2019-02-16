@@ -24,7 +24,7 @@ func GetDetails(query map[string]string, ch chan<- GetDetailsResult) {
 	result := GetDetailsResult{}
 
 	resp, err := http.Get(baseURL + detailPath + "?" + values.Encode())
-	fmt.Printf("⚡️  %s\n", resp.Request.URL)
+	fmt.Printf("\n⚡️  %s\n\n", resp.Request.URL)
 
 	if err != nil {
 		result.Err = err
@@ -43,6 +43,5 @@ func GetDetails(query map[string]string, ch chan<- GetDetailsResult) {
 	json.Unmarshal(bytes, &detailResponse)
 
 	result.Response = detailResponse
-	fmt.Println("⚙️  ch <- GetDetailsResult")
 	ch <- result
 }
