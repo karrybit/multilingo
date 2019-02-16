@@ -12,6 +12,7 @@ func main() {
 	query["language"] = "swift"
 	// TODO: add after parse
 	query["source_code"] = "print(114514)"
+	query["api_key"] = "guest"
 	createResponse, err := request.CreateID(query)
 	if err != nil {
 		fmt.Println(err)
@@ -22,7 +23,7 @@ func main() {
 	// TODO: goroutin使う
 	time.Sleep(2 * time.Second)
 
-	detailsResponse, err := request.GetDetails(map[string]string{"id": createResponse.ID})
+	detailsResponse, err := request.GetDetails(map[string]string{"id": createResponse.ID, "api_key": "guest"})
 	if err != nil {
 		fmt.Println(err)
 		return

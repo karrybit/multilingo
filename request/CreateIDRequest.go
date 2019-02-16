@@ -14,7 +14,6 @@ func CreateID(query map[string]string) (*model.CreateResponse, error) {
 	for k, v := range query {
 		values.Add(k, v)
 	}
-	values.Add("api_key", "guest")
 
 	resp, err := http.PostForm(baseURL+createPath, values)
 	if err != nil {
