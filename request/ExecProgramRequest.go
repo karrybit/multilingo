@@ -9,18 +9,18 @@ import (
 	"github.com/TakumiKaribe/MultilinGo/model"
 )
 
-type CreateIDResult struct {
-	Response model.CreateResponse
+type StatusResult struct {
+	Response model.Status
 	Err      error
 }
 
-func CreateID(query map[string]string, ch chan<- CreateIDResult) {
+func ExecProgramRequest(query map[string]string, ch chan<- StatusResult) {
 	values := url.Values{}
 	for k, v := range query {
 		values.Add(k, v)
 	}
 
-	result := CreateIDResult{}
+	result := StatusResult{}
 
 	resp, err := http.PostForm(baseURL+createPath, values)
 	fmt.Printf("\n⚡️  %s\n\n", resp.Request.URL)
@@ -32,13 +32,13 @@ func CreateID(query map[string]string, ch chan<- CreateIDResult) {
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
-	var createResponse model.CreateResponse
-	err = decoder.Decode(&createResponse)
+	var status model.Status
+	err = decoder.Decode(&status)
 	if err != nil {
 		result.Err = err
 		ch <- result
 	}
 
-	result.Response = createResponse
+	result.Response = status
 	ch <- result
 }

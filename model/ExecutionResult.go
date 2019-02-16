@@ -1,6 +1,6 @@
 package model
 
-type DetailResponse struct {
+type ExecutionResult struct {
 	ID            string `json:"id"`
 	Language      string `json:"language"`
 	Note          string `json:"note"`
@@ -20,4 +20,4 @@ type DetailResponse struct {
 	Result        string `json:"result"`
 }
 
-func (dr *DetailResponse) Log() {}
+func (dr *ExecutionResult) Log() {}

@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	id := f()
+	g(id)
+}
+
+func f() string {
+	// --- SETUP ---
 	query := map[string]string{}
 	query["language"] = "swift"
 	// TODO: add after parse
@@ -15,24 +21,29 @@ func main() {
 	query["api_key"] = "guest"
 
 	// --- REQUEST ---
-	createChannel := make(chan request.CreateIDResult)
-	go request.CreateID(query, createChannel)
+	ch := make(chan request.StatusResult)
+	go request.ExecProgramRequest(query, ch)
 
-	createResult := <-createChannel
+	result := <-ch
 
 	// --- ERROR ---
-	if createResult.Err != nil {
-		fmt.Println(createResult.Err)
-		return
+	if result.Err != nil {
+		fmt.Println(result.Err)
+		return ""
 	}
 
-	log.PrintFields(&createResult.Response)
+	// --- LOG ---
+	log.PrintFields(&result.Response)
 
+	return result.Response.ID
+}
+
+func g(id string) {
 	// --- REQUEST ---
-	detailChannel := make(chan request.GetDetailsResult)
-	go request.GetDetails(map[string]string{"id": createResult.Response.ID, "api_key": "guest"}, detailChannel)
+	ch := make(chan request.ExecutionResult)
+	go request.GetResultRequest(map[string]string{"id": id, "api_key": "guest"}, ch)
 
-	detailResult := <-detailChannel
+	detailResult := <-ch
 
 	// --- ERROR ---
 	if detailResult.Err != nil {
@@ -40,5 +51,6 @@ func main() {
 		return
 	}
 
+	// --- LOG ---
 	log.PrintFields(&detailResult.Response)
 }
