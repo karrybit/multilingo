@@ -3,7 +3,6 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -32,14 +31,13 @@ func CreateID(query map[string]string, ch chan<- CreateIDResult) {
 
 	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
+	decoder := json.NewDecoder(resp.Body)
+	var createResponse model.CreateResponse
+	err = decoder.Decode(&createResponse)
 	if err != nil {
 		result.Err = err
 		ch <- result
 	}
-
-	var createResponse model.CreateResponse
-	json.Unmarshal(bytes, &createResponse)
 
 	result.Response = createResponse
 	ch <- result

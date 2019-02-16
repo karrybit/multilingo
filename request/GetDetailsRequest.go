@@ -3,7 +3,6 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -33,14 +32,13 @@ func GetDetails(query map[string]string, ch chan<- GetDetailsResult) {
 
 	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
+	decoder := json.NewDecoder(resp.Body)
+	var detailResponse model.DetailResponse
+	err = decoder.Decode(&detailResponse)
 	if err != nil {
 		result.Err = err
 		ch <- result
 	}
-
-	var detailResponse model.DetailResponse
-	json.Unmarshal(bytes, &detailResponse)
 
 	result.Response = detailResponse
 	ch <- result
