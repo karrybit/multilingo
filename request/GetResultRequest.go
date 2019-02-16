@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/TakumiKaribe/MultilinGo/model"
 )
@@ -16,7 +15,6 @@ type ExecutionResult struct {
 }
 
 func GetResultRequest(query map[string]string, ch chan<- ExecutionResult) {
-	time.Sleep(1 * time.Second)
 	values := url.Values{}
 	for k, v := range query {
 		values.Add(k, v)
