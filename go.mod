@@ -1,1 +1,1 @@
-module MultilinGo
+module github.com/TakumiKaribe/MultilinGo
