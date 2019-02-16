@@ -9,11 +9,11 @@ import (
 )
 
 func main() {
-	id := f()
-	g(id)
+	id := execProgram()
+	getResult(id)
 }
 
-func f() string {
+func execProgram() string {
 	// --- SETUP ---
 	query := map[string]string{}
 	query["language"] = "swift"
@@ -39,7 +39,7 @@ func f() string {
 	return result.Response.ID
 }
 
-func g(id string) {
+func getResult(id string) {
 	for status := "runnig"; status != "completed"; time.Sleep(1 * time.Second) {
 		ch := make(chan request.StatusResult)
 		go request.GetStatusRequest(map[string]string{"id": id, "api_key": "guest"}, ch)
