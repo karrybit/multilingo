@@ -14,7 +14,7 @@ func PrintFields(target Logger) {
 	t := v.Type()
 	fmt.Println("{")
 	for i := 0; i < t.NumField(); i++ {
-		fmt.Printf("\t%s:\t%v\n", t.Field(i).Name, v.Field(i))
+		fmt.Printf("\t%-15s%v\n", t.Field(i).Name, v.Field(i))
 	}
 	fmt.Println("}")
 }
