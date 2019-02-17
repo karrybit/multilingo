@@ -5,12 +5,20 @@ import (
 	"time"
 
 	"github.com/TakumiKaribe/MultilinGo/logger"
+	"github.com/TakumiKaribe/MultilinGo/model"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
 func main() {
 	id := execProgram()
 	getResult(id)
+	data := model.SlackRequestData{
+		Token:    "gwbfPbBL1HEng7ZF0V8KOHAh",
+		Channel:  "CG6LK3GSF",
+		Text:     "114514",
+		UserName: "UG7SDTG87",
+	}
+	data.Notification()
 }
 
 func execProgram() string {
