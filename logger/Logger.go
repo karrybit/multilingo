@@ -1,7 +1,7 @@
-package log
+package logger
 
 import (
-	"fmt"
+	"log"
 	"reflect"
 )
 
@@ -14,9 +14,9 @@ type Logger interface {
 func PrintFields(target Logger) {
 	v := reflect.Indirect(reflect.ValueOf(target))
 	t := v.Type()
-	fmt.Printf("📦 %v {\n", t)
+	log.Printf("📦 %v {\n", t)
 	for i := 0; i < t.NumField(); i++ {
-		fmt.Printf("\t%-15s%v\n", t.Field(i).Name, v.Field(i))
+		log.Printf("\t%-15s%v\n", t.Field(i).Name, v.Field(i))
 	}
-	fmt.Println("}")
+	log.Println("}")
 }

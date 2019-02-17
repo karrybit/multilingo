@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TakumiKaribe/MultilinGo/log"
+	"github.com/TakumiKaribe/MultilinGo/logger"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
@@ -29,7 +29,7 @@ func execProgram() string {
 		return ""
 	}
 
-	log.PrintFields(&result.Response)
+	logger.PrintFields(&result.Response)
 
 	return result.Response.ID
 }
@@ -55,5 +55,5 @@ func getResult(id string) {
 		return
 	}
 
-	log.PrintFields(&detailResult.Response)
+	logger.PrintFields(&detailResult.Response)
 }

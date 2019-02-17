@@ -2,7 +2,7 @@ package request
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -25,7 +25,7 @@ func ExecProgramRequest(query map[string]string, ch chan<- StatusResult) {
 	result := StatusResult{}
 
 	resp, err := http.PostForm(baseURL+createPath, values)
-	fmt.Printf("\n⚡️  %s\n\n", resp.Request.URL)
+	log.Printf("⚡️  %s\n", resp.Request.URL)
 	if err != nil {
 		result.Err = err
 		ch <- result

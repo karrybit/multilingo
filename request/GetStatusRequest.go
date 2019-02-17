@@ -2,7 +2,7 @@ package request
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -19,7 +19,7 @@ func GetStatusRequest(query map[string]string, ch chan<- StatusResult) {
 	result := StatusResult{}
 
 	resp, err := http.Get(baseURL + statusPath + "?" + values.Encode())
-	fmt.Printf("\n⚡️  %s\n\n", resp.Request.URL)
+	log.Printf("⚡️  %s\n", resp.Request.URL)
 	if err != nil {
 		result.Err = err
 		ch <- result
