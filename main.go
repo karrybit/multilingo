@@ -6,13 +6,13 @@ import (
 
 	"github.com/TakumiKaribe/MultilinGo/logger"
 	"github.com/TakumiKaribe/MultilinGo/model"
-	"github.com/TakumiKaribe/MultilinGo/parseRawText"
+	"github.com/TakumiKaribe/MultilinGo/parserawtext"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
 func main() {
-	lambdaInput := "<@UG6LTEJBV>\nprint(114514)\n"
-	lang, text, err := parseRawText.Parse(lambdaInput)
+	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
+	lang, text, err := parserawtext.Parse(lambdaInput)
 	if err != nil {
 		fmt.Println(err)
 	}

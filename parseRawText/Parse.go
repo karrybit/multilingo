@@ -1,8 +1,6 @@
-package parseRawText
+package parserawtext
 
-import (
-	"strings"
-)
+import "strings"
 
 // TODO: receive lambda context instead of string
 func Parse(text string) (lang string, program string, err error) {

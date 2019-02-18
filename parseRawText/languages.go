@@ -1,8 +1,6 @@
-package parseRawText
+package parserawtext
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func lookUp(id string) (string, error) {
 	switch id {
