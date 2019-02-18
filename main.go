@@ -11,9 +11,11 @@ import (
 )
 
 func main() {
+	// TODO: receive lambda context instead of string
 	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
 	lang, text, err := parserawtext.Parse(lambdaInput)
 	if err != nil {
+		// TODO: response slack notification
 		fmt.Println(err)
 	}
 	status := execProgram(lang, text)
