@@ -12,7 +12,10 @@ import (
 
 func main() {
 	lambdaInput := "<@UG6LTEJBV>\nprint(114514)\n"
-	lang, text := parseRawText.Parse(lambdaInput)
+	lang, text, err := parseRawText.Parse(lambdaInput)
+	if err != nil {
+		fmt.Println(err)
+	}
 	status := execProgram(lang, text)
 	getResult(status)
 }
