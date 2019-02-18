@@ -9,7 +9,7 @@ func Parse(text string) (lang string, program string, err error) {
 		return
 	}
 
-	program, err = parseProgram(text)
+	program = parseProgram(text)
 	return
 }
 
@@ -23,11 +23,11 @@ func parseLanguage(text string) (lang string, err error) {
 	return
 }
 
-func parseProgram(text string) (program string, err error) {
+func parseProgram(text string) string {
 	// find first '>'
 	findAtGreaterThan := func(c rune) bool { return c == '>' }
 	text = text[strings.IndexFunc(text, findAtGreaterThan)+1:]
 	text = strings.TrimSpace(text)
 	text = strings.Trim(text, "\n`")
-	return text, err
+	return text
 }
