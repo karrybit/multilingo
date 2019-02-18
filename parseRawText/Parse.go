@@ -26,6 +26,7 @@ func parseLanguage(text string) (lang string, err error) {
 func parseProgram(text string) string {
 	// find first '>'
 	findAtGreaterThan := func(c rune) bool { return c == '>' }
+	// if '>' is not found, no operation. because it's text[-1 + 1:]
 	text = text[strings.IndexFunc(text, findAtGreaterThan)+1:]
 	text = strings.TrimSpace(text)
 	text = strings.Trim(text, "\n`")
