@@ -18,7 +18,8 @@ func TestParseLanguageNormal(t *testing.T) {
 
 func TestParseProgramNormal(t *testing.T) {
 	// map[string]string{argument: expected}
-	programMap := map[string]string{"```print(\"hello world\")```": "print(\"hello world\")"}
+	programMap := map[string]string{"```print(\"hello world\")```": "print(\"hello world\")",
+		"```func main() {\nprint(114514)\n}\n```": "func main() {\nprint(114514)\n}"}
 	for k, v := range programMap {
 		program := parseProgram(k)
 		if program != v {
