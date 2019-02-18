@@ -5,15 +5,16 @@ import (
 	"time"
 
 	"github.com/TakumiKaribe/MultilinGo/logger"
+	"github.com/TakumiKaribe/MultilinGo/model"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
 func main() {
-	id := execProgram()
-	getResult(id)
+	status := execProgram()
+	getResult(status)
 }
 
-func execProgram() string {
+func execProgram() model.Status {
 	// TODO: language type
 	query := map[string]string{"language": "swift", "api_key": "guest"}
 	// TODO: add after parse
@@ -26,16 +27,16 @@ func execProgram() string {
 
 	if result.Err != nil {
 		fmt.Println(result.Err)
-		return ""
+		return model.Status{}
 	}
 
 	logger.PrintFields(&result.Response)
 
-	return result.Response.ID
+	return result.Response
 }
 
-func getResult(id string) {
-	query := map[string]string{"id": id, "api_key": "guest"}
+func getResult(status model.Status) {
+	query := map[string]string{"id": status.ID, "api_key": "guest"}
 
 	// wait execute program until completed
 	for status := "runnig"; status != "completed"; time.Sleep(1 * time.Second) {
