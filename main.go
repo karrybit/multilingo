@@ -6,19 +6,25 @@ import (
 
 	"github.com/TakumiKaribe/MultilinGo/logger"
 	"github.com/TakumiKaribe/MultilinGo/model"
+	"github.com/TakumiKaribe/MultilinGo/parserawtext"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
 func main() {
-	status := execProgram()
+	// TODO: receive lambda context instead of string
+	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
+	lang, text, err := parserawtext.Parse(lambdaInput)
+	if err != nil {
+		// TODO: response slack notification
+		fmt.Println(err)
+	}
+	status := execProgram(lang, text)
 	getResult(status)
 }
 
-func execProgram() model.Status {
+func execProgram(lang string, program string) model.Status {
 	// TODO: language type
-	query := map[string]string{"language": "swift", "api_key": "guest"}
-	// TODO: add after parse
-	query["source_code"] = "print(114514)"
+	query := map[string]string{"language": lang, "api_key": "guest", "source_code": program}
 
 	ch := make(chan request.StatusResult)
 	go request.ExecProgramRequest(query, ch)
