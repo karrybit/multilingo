@@ -6,26 +6,25 @@ import (
 
 	"github.com/TakumiKaribe/MultilinGo/logger"
 	"github.com/TakumiKaribe/MultilinGo/model"
+	"github.com/TakumiKaribe/MultilinGo/parserawtext"
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
 func main() {
-	id := execProgram()
-	getResult(id)
-	data := model.SlackRequestData{
-		Token:    "gwbfPbBL1HEng7ZF0V8KOHAh",
-		Channel:  "CG6LK3GSF",
-		Text:     "114514",
-		UserName: "UG7SDTG87",
+	// TODO: receive lambda context instead of string
+	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
+	lang, text, err := parserawtext.Parse(lambdaInput)
+	if err != nil {
+		// TODO: response slack notification
+		fmt.Println(err)
 	}
-	data.Notification()
+	status := execProgram(lang, text)
+	getResult(status)
 }
 
-func execProgram() string {
+func execProgram(lang string, program string) model.Status {
 	// TODO: language type
-	query := map[string]string{"language": "swift", "api_key": "guest"}
-	// TODO: add after parse
-	query["source_code"] = "print(114514)"
+	query := map[string]string{"language": lang, "api_key": "guest", "source_code": program}
 
 	ch := make(chan request.StatusResult)
 	go request.ExecProgramRequest(query, ch)
@@ -34,16 +33,16 @@ func execProgram() string {
 
 	if result.Err != nil {
 		fmt.Println(result.Err)
-		return ""
+		return model.Status{}
 	}
 
 	logger.PrintFields(&result.Response)
 
-	return result.Response.ID
+	return result.Response
 }
 
-func getResult(id string) {
-	query := map[string]string{"id": id, "api_key": "guest"}
+func getResult(status model.Status) {
+	query := map[string]string{"id": status.ID, "api_key": "guest"}
 
 	// wait execute program until completed
 	for status := "runnig"; status != "completed"; time.Sleep(1 * time.Second) {
