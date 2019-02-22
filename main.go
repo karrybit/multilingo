@@ -11,9 +11,21 @@ import (
 )
 
 type Config struct {
-	Debug         bool   `default:"false"`
-	AuthToken     string `required:"true" split_words:"true"`
-	LogFormatJson bool   `default:"true"  split_words:"true"`
+	Debug         bool `default:"false"`
+	LogFormatJson bool `default:"true"  split_words:"true"`
+	// Authentication token for each language
+	CToken          string `required:"true" split_words:"true"`
+	CppToken        string `required:"true" split_words:"true"`
+	CsharpToken     string `required:"true" split_words:"true"`
+	JavaToken       string `required:"true" split_words:"true"`
+	Python3Token    string `required:"true" split_words:"true"`
+	RubyToken       string `required:"true" split_words:"true"`
+	JavascriptToken string `required:"true" split_words:"true"`
+	ScalaToken      string `required:"true" split_words:"true"`
+	GoToken         string `required:"true" split_words:"true"`
+	HaskellToken    string `required:"true" split_words:"true"`
+	RustToken       string `required:"true" split_words:"true"`
+	SwiftToken      string `required:"true" split_words:"true"`
 }
 
 func main() {
