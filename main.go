@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/TakumiKaribe/MultilinGo/logger"
 	"github.com/TakumiKaribe/MultilinGo/model"
@@ -10,16 +15,48 @@ import (
 	"github.com/TakumiKaribe/MultilinGo/request"
 )
 
-func main() {
-	// TODO: receive lambda context instead of string
-	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
-	lang, text, err := parserawtext.Parse(lambdaInput)
+// TODO: naming
+type APIGateWayRequest struct {
+	Token    string `json:"token"`
+	TeamID   string `json:"team_id"`
+	ApiAppID string `json:"api_app_id"`
+	Event    Event  `json:"event"`
+}
+
+type Event struct {
+	ClientMsgId    string `json:"client_msg_id"`
+	EventType      string `json:"type"`
+	Text           string `json:"text"`
+	User           string `json:"user"`
+	Timestamp      string `json:"ts"`
+	Channel        string `json:"channel"`
+	EventTimestamp string `json:"event_ts"`
+}
+
+func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	fmt.Printf("Body: %v\n", apiRequest.Body)
+	var requestBody APIGateWayRequest
+	err := json.Unmarshal([]byte(apiRequest.Body), &requestBody)
 	if err != nil {
-		// TODO: response slack notification
-		fmt.Println(err)
+		fmt.Printf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+	}
+
+	lang, text, err := parserawtext.Parse(requestBody.Event.Text)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
 	}
 	status := execProgram(lang, text)
 	getResult(status)
+
+	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+}
+
+func main() {
+	if false {
+		lambda.Start(HelloLambdaHandler)
+	}
 }
 
 func execProgram(lang string, program string) model.Status {
