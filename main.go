@@ -60,7 +60,6 @@ func main() {
 }
 
 func execProgram(lang string, program string) model.Status {
-	// TODO: language type
 	query := map[string]string{"language": lang, "api_key": "guest", "source_code": program}
 
 	ch := make(chan request.StatusResult)
