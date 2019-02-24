@@ -35,6 +35,8 @@ type Event struct {
 
 func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Body: %v\n", apiRequest.Body)
+
+	// parse json
 	var requestBody APIGateWayRequest
 	err := json.Unmarshal([]byte(apiRequest.Body), &requestBody)
 	if err != nil {
@@ -42,11 +44,21 @@ func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRe
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
 	}
 
-	lang, text, err := parserawtext.Parse(requestBody.Event.Text)
+	// look up language type
+	lang, err := lookUpLanguage(&requestBody)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
 	}
+
+	// parse program
+	text, err := parserawtext.Parse(requestBody.Event.Text)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+	}
+
+	// post paiza
 	status := execProgram(lang, text)
 	getResult(status)
 
