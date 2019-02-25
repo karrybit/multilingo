@@ -1,22 +1,54 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/TakumiKaribe/MultilinGo/logger"
 	"github.com/TakumiKaribe/MultilinGo/model"
 	"github.com/TakumiKaribe/MultilinGo/parserawtext"
 	"github.com/TakumiKaribe/MultilinGo/request"
+	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
 )
 
+type Config struct {
+	Debug         bool `default:"false"`
+	LogFormatJson bool `default:"true"  split_words:"true"`
+	// Authentication token for each language
+	CToken          string `required:"true" split_words:"true"`
+	CppToken        string `required:"true" split_words:"true"`
+	CsharpToken     string `required:"true" split_words:"true"`
+	JavaToken       string `required:"true" split_words:"true"`
+	Python3Token    string `required:"true" split_words:"true"`
+	RubyToken       string `required:"true" split_words:"true"`
+	JavascriptToken string `required:"true" split_words:"true"`
+	ScalaToken      string `required:"true" split_words:"true"`
+	GoToken         string `required:"true" split_words:"true"`
+	HaskellToken    string `required:"true" split_words:"true"`
+	RustToken       string `required:"true" split_words:"true"`
+	SwiftToken      string `required:"true" split_words:"true"`
+}
+
 func main() {
+	var conf Config
+	err := envconfig.Process("mgo", &conf) // env variable like MGO_AUTH_TOKEN
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	// default level is INFO
+	if conf.Debug {
+		log.SetLevel(log.DebugLevel)
+	}
+	// default log format is ASCII
+	if conf.LogFormatJson {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+
 	// TODO: receive lambda context instead of string
 	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
 	lang, text, err := parserawtext.Parse(lambdaInput)
 	if err != nil {
 		// TODO: response slack notification
-		fmt.Println(err)
+		log.Fatal("failed to parse request. err: ", err)
 	}
 	status := execProgram(lang, text)
 	getResult(status)
@@ -32,11 +64,11 @@ func execProgram(lang string, program string) model.Status {
 	result := <-ch
 
 	if result.Err != nil {
-		fmt.Println(result.Err)
+		log.Warn(result.Err)
 		return model.Status{}
 	}
 
-	logger.PrintFields(&result.Response)
+	log.Debug(&result.Response)
 
 	return result.Response
 }
@@ -58,9 +90,9 @@ func getResult(status model.Status) {
 	detailResult := <-ch
 
 	if detailResult.Err != nil {
-		fmt.Println(detailResult.Err)
+		log.Warn(detailResult.Err)
 		return
 	}
 
-	logger.PrintFields(&detailResult.Response)
+	log.Debug(&detailResult.Response)
 }
