@@ -20,6 +20,3 @@ type ExecutionResult struct {
 	Connections   int    `json:"connections"`
 	Result        string `json:"result"`
 }
-
-// Log is standard output of all properties
-func (dr *ExecutionResult) Log() {}
