@@ -1,20 +1,76 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
-	"github.com/TakumiKaribe/MultilinGo/model"
-	"github.com/TakumiKaribe/MultilinGo/parserawtext"
-	"github.com/TakumiKaribe/MultilinGo/request"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+
+	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/parserawtext"
+	"github.com/TakumiKaribe/multilingo/request"
 	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 )
+
+// TODO: naming
+type APIGateWayRequest struct {
+	Token    string `json:"token"`
+	TeamID   string `json:"team_id"`
+	ApiAppID string `json:"api_app_id"`
+	Event    Event  `json:"event"`
+}
+
+type Event struct {
+	ClientMsgId    string `json:"client_msg_id"`
+	EventType      string `json:"type"`
+	Text           string `json:"text"`
+	User           string `json:"user"`
+	Timestamp      string `json:"ts"`
+	Channel        string `json:"channel"`
+	EventTimestamp string `json:"event_ts"`
+}
+
+func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	fmt.Printf("Body: %v\n", apiRequest.Body)
+
+	// parse json
+	var requestBody APIGateWayRequest
+	err := json.Unmarshal([]byte(apiRequest.Body), &requestBody)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+	}
+
+	// look up language type
+	lang, err := lookUpLanguage(&requestBody)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+	}
+
+	// parse program
+	text, err := parserawtext.Parse(requestBody.Event.Text)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+	}
+
+	// post paiza
+	status := execProgram(lang, text)
+	getResult(status)
+
+	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil	
+}
+
 
 type Config struct {
 	Debug         bool `default:"false"`
 	LogFormatJson bool `default:"true"  split_words:"true"`
 	// Authentication token for each language
-	CToken          string `required:"true" split_words:"true"`
 	CppToken        string `required:"true" split_words:"true"`
 	CsharpToken     string `required:"true" split_words:"true"`
 	JavaToken       string `required:"true" split_words:"true"`
@@ -26,6 +82,7 @@ type Config struct {
 	HaskellToken    string `required:"true" split_words:"true"`
 	RustToken       string `required:"true" split_words:"true"`
 	SwiftToken      string `required:"true" split_words:"true"`
+	KotlinToken     string `required:"true" split_words:"true"`
 }
 
 func main() {
@@ -43,19 +100,12 @@ func main() {
 		log.SetFormatter(&log.JSONFormatter{})
 	}
 
-	// TODO: receive lambda context instead of string
-	lambdaInput := "<@UG6LTEJBV>\n```print(114514)```\n"
-	lang, text, err := parserawtext.Parse(lambdaInput)
-	if err != nil {
-		// TODO: response slack notification
-		log.Fatal("failed to parse request. err: ", err)
+	if false {
+		lambda.Start(HelloLambdaHandler)
 	}
-	status := execProgram(lang, text)
-	getResult(status)
 }
 
 func execProgram(lang string, program string) model.Status {
-	// TODO: language type
 	query := map[string]string{"language": lang, "api_key": "guest", "source_code": program}
 
 	ch := make(chan request.StatusResult)

@@ -1,5 +1,5 @@
-github.com/TakumiKaribe/MultilinGo v0.0.0-20190225002806-064e3354da68 h1:4xLJ7AFylNFAqW2VVW8TpwFPSv8xnohcyNyi3c4iZEw=
-github.com/TakumiKaribe/MultilinGo v0.0.0-20190225002806-064e3354da68/go.mod h1:uEQf7PXDn4jT5Zo6XELWBDLPEnDlTU2CytWSB8pePxA=
+github.com/aws/aws-lambda-go v1.8.2 h1:wC8KcAG9HyVkFjbKQ9uhp87UGZutlPn9IJPq9fYM2BQ=
+github.com/aws/aws-lambda-go v1.8.2/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/kelseyhightower/envconfig v1.3.0 h1:IvRS4f2VcIQy6j4ORGIf9145T/AsUB+oY8LyvN8BXNM=
 github.com/kelseyhightower/envconfig v1.3.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=

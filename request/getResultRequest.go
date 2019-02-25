@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/TakumiKaribe/MultilinGo/model"
+	"github.com/TakumiKaribe/multilingo/model"
 )
 
 // ExecutionResult -

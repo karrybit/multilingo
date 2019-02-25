@@ -39,16 +39,16 @@ type Attachment struct {
 func NewClient(urlStr string, botUserAccessToken string, appAuthToken string) (*Client, error) {
 	parsedURL, err := url.ParseRequestURI(urlStr)
 
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to parse url: %s", urlStr)
+	}
+
 	if len(botUserAccessToken) == 0 {
 		return nil, errors.New("missing  botUserAccessToken")
 	}
 
 	if len(appAuthToken) == 0 {
 		return nil, errors.New("missing user appAuthToken")
-	}
-
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse url: %s", urlStr)
 	}
 
 	client := &http.Client{Timeout: time.Duration(10) * time.Second}
