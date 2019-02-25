@@ -9,10 +9,11 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
-	"github.com/TakumiKaribe/MultilinGo/logger"
-	"github.com/TakumiKaribe/MultilinGo/model"
-	"github.com/TakumiKaribe/MultilinGo/parserawtext"
-	"github.com/TakumiKaribe/MultilinGo/request"
+	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/parserawtext"
+	"github.com/TakumiKaribe/multilingo/request"
+	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
 )
 
 // TODO: naming
@@ -62,10 +63,43 @@ func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRe
 	status := execProgram(lang, text)
 	getResult(status)
 
-	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil	
+}
+
+
+type Config struct {
+	Debug         bool `default:"false"`
+	LogFormatJson bool `default:"true"  split_words:"true"`
+	// Authentication token for each language
+	CppToken        string `required:"true" split_words:"true"`
+	CsharpToken     string `required:"true" split_words:"true"`
+	JavaToken       string `required:"true" split_words:"true"`
+	Python3Token    string `required:"true" split_words:"true"`
+	RubyToken       string `required:"true" split_words:"true"`
+	JavascriptToken string `required:"true" split_words:"true"`
+	ScalaToken      string `required:"true" split_words:"true"`
+	GoToken         string `required:"true" split_words:"true"`
+	HaskellToken    string `required:"true" split_words:"true"`
+	RustToken       string `required:"true" split_words:"true"`
+	SwiftToken      string `required:"true" split_words:"true"`
+	KotlinToken     string `required:"true" split_words:"true"`
 }
 
 func main() {
+	var conf Config
+	err := envconfig.Process("mgo", &conf) // env variable like MGO_AUTH_TOKEN
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	// default level is INFO
+	if conf.Debug {
+		log.SetLevel(log.DebugLevel)
+	}
+	// default log format is ASCII
+	if conf.LogFormatJson {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+
 	if false {
 		lambda.Start(HelloLambdaHandler)
 	}
@@ -80,11 +114,11 @@ func execProgram(lang string, program string) model.Status {
 	result := <-ch
 
 	if result.Err != nil {
-		fmt.Println(result.Err)
+		log.Warn(result.Err)
 		return model.Status{}
 	}
 
-	logger.PrintFields(&result.Response)
+	log.Debug(&result.Response)
 
 	return result.Response
 }
@@ -106,9 +140,9 @@ func getResult(status model.Status) {
 	detailResult := <-ch
 
 	if detailResult.Err != nil {
-		fmt.Println(detailResult.Err)
+		log.Warn(detailResult.Err)
 		return
 	}
 
-	logger.PrintFields(&detailResult.Response)
+	log.Debug(&detailResult.Response)
 }
