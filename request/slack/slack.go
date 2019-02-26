@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"path"
 	"time"
+	"encoding/json"
 
 	"github.com/pkg/errors"
 )
@@ -15,7 +16,6 @@ type Client struct {
 	URL                *url.URL
 	HTTPClient         *http.Client
 	botUserAccessToken string
-	appAuthToken       string
 }
 
 // SlackRequestBody -
@@ -36,31 +36,22 @@ type Attachment struct {
 }
 
 // NewClient Constructor -
-func NewClient(urlStr string, botUserAccessToken string, appAuthToken string) (*Client, error) {
-	parsedURL, err := url.ParseRequestURI(urlStr)
-
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse url: %s", urlStr)
-	}
-
+func NewClient(botUserAccessToken string) (*Client, error) {
+	
 	if len(botUserAccessToken) == 0 {
 		return nil, errors.New("missing  botUserAccessToken")
 	}
-
-	if len(appAuthToken) == 0 {
-		return nil, errors.New("missing user appAuthToken")
-	}
-
-	client := &http.Client{Timeout: time.Duration(10) * time.Second}
-
-	return &Client{parsedURL, client, botUserAccessToken, appAuthToken}, nil
+	
+	client = Client{botUserAccessToken: botUserAccessToken}
+	client.URL, _ = url.Parse("https://ntj.slack.com/api/chat.postMessage")
+	client.HTTPClient = &http.Client{Timeout: time.Duration(10) * time.Second}
+	return &client, nil
 }
 
-// NewRequest -
-func (c *Client) NewRequest(method string, spath string, body io.Reader) (*http.Request, error) {
+// newRequest -
+func (c *Client) newRequest(method string, body io.Reader) (*http.Request, error) {
 
 	u := *c.URL
-	u.Path = path.Join(c.URL.Path, spath)
 
 	req, err := http.NewRequest(method, u.String(), body)
 	if err != nil {
@@ -74,6 +65,14 @@ func (c *Client) NewRequest(method string, spath string, body io.Reader) (*http.
 
 // Notification -
 func (c *Client) Notification(body SlackRequestBody) {
-	// TODO
-	// bodyにappAuthTokenを含める処理を描くお
+	bodyByte, _ = json.Marshal(body)
+	bodyReader := bytes.NewReader(bodyByte)
+	
+	req, _ := c.newRequest("POST", nil, bodyReader)
+    if err != nil {
+		// @TODO: リクエストの作成に失敗したとき
+        return
+    }
+
+    res, _ := c.HTTPClient.Do(req)
 }
