@@ -21,7 +21,7 @@ type Config struct {
 	KotlinToken     string `required:"true" split_words:"true"`
 }
 
-func new() (*Config, error) {
+func newConfig() (*Config, error) {
 	var config Config
 	err := envconfig.Process("", &config) // env variable like MGO_AUTH_TOKEN
 	if err != nil {
