@@ -32,9 +32,10 @@ type StatusResult struct {
 }
 
 // ExecProgramRequest is request to execute program
-func (c *Client) ExecProgram(query map[string]string, ch chan<- StatusResult) {
+func (c *Client) ExecProgram(lang string, program string, ch chan<- StatusResult) {
 	result := StatusResult{}
 
+	query := map[string]string{"language": lang, "api_key": "guest", "source_code": program}
 	bodyByte, _ := json.Marshal(query)
 	bodyReader := bytes.NewReader(bodyByte)
 
@@ -66,9 +67,10 @@ func (c *Client) ExecProgram(query map[string]string, ch chan<- StatusResult) {
 }
 
 // GetStatusRequest is request to get execution status
-func (c *Client) GetStatusRequest(query map[string]string, ch chan<- StatusResult) {
+func (c *Client) GetStatusRequest(id string, ch chan<- StatusResult) {
 	result := StatusResult{}
 
+	query := map[string]string{"id": id, "api_key": "guest"}
 	bodyByte, _ := json.Marshal(query)
 	bodyReader := bytes.NewReader(bodyByte)
 
@@ -106,9 +108,10 @@ type ExecutionResult struct {
 }
 
 // GetResultRequest is request to get execution result
-func (c *Client) GetResultRequest(query map[string]string, ch chan<- ExecutionResult) {
+func (c *Client) GetResultRequest(id string, ch chan<- ExecutionResult) {
 	result := ExecutionResult{}
 
+	query := map[string]string{"id": id, "api_key": "guest"}
 	bodyByte, _ := json.Marshal(query)
 	bodyReader := bytes.NewReader(bodyByte)
 

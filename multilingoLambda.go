@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/TakumiKaribe/multilingo/parserawtext"
+	"github.com/TakumiKaribe/multilingo/request/paiza"
 	"github.com/TakumiKaribe/multilingo/request/slack"
 	"github.com/aws/aws-lambda-go/events"
 	log "github.com/sirupsen/logrus"
@@ -29,7 +31,7 @@ type Event struct {
 	EventTimestamp string `json:"event_ts"`
 }
 
-func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Body: %v\n", apiRequest.Headers)
 	fmt.Printf("Body: %v\n", apiRequest.Body)
 
@@ -53,17 +55,14 @@ func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRe
 		log.Fatal(err.Error())
 	}
 
-	// TODO:
-	/*
-		// default level is INFO
-		if conf.Debug {
-			log.SetLevel(log.DebugLevel)
-		}
-		// default log format is ASCII
-		if conf.LogFormatJson {
-			log.SetFormatter(&log.JSONFormatter{})
-		}
-	*/
+	// default level is INFO
+	if config.Debug {
+		log.SetLevel(log.DebugLevel)
+	}
+	// default log format is ASCII
+	if config.LogFormatJson {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
 
 	// parse program
 	text, err := parserawtext.Parse(requestBody.Event.Text)
@@ -73,21 +72,38 @@ func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRe
 	}
 
 	// post paiza
-	status, err := execProgram(lang, text)
-	if err != err {
+	paizaClient, err := paiza.NewClient()
+	if err != nil {
 		log.Warn(err.Error())
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
 	}
 
-	result, err := getResult(status)
-	if err != err {
-		log.Warn(err.Error())
+	execCh := make(chan paiza.StatusResult)
+	go paizaClient.ExecProgram(lang, text, execCh)
+	execStatus := <-execCh
+	if execStatus.Err != nil {
+		log.Warn(execStatus.Err.Error())
+	}
+	log.Debug(&execStatus.Response)
+
+	// wait execute program until completed
+	for status := "runnig"; status != "completed"; time.Sleep(1 * time.Second) {
+		statusCh := make(chan paiza.StatusResult)
+		go paizaClient.GetStatusRequest(execStatus.Response.ID, statusCh)
+		statusResult := <-statusCh
+		status = statusResult.Response.Status
+	}
+
+	detailCh := make(chan paiza.ExecutionResult)
+	go paizaClient.GetResultRequest(execStatus.Response.ID, detailCh)
+	executionResult := <-detailCh
+
+	if executionResult.Err != nil {
+		log.Warn(executionResult.Err.Error())
 	}
 
 	// TODO:
-	_ = result
-
-	// TODO:
-	client, _ := slack.NewClient("host", "token")
+	slackClient, _ := slack.NewClient("host", "token")
 
 	body := slack.SlackRequestBody{}
 	body.Token = requestBody.Token
@@ -102,7 +118,7 @@ func HelloLambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRe
 	body.Channel = requestBody.Event.Channel
 	body.UserName = requestBody.Event.User
 
-	client.Notification(body)
+	slackClient.Notification(body)
 
 	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 222}, nil
 }
