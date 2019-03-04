@@ -13,14 +13,14 @@ import (
 
 // Client -
 type Client struct {
-	URL        *url.URL
+	BaseURL    *url.URL
 	HTTPClient *http.Client
 }
 
 // NewClient Constructor -
 func NewClient() (*Client, error) {
 	client := Client{HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
-	client.URL, _ = url.Parse("http://api.paiza.io:80/runners/")
+	client.BaseURL, _ = url.Parse("http://api.paiza.io:80/runners/")
 
 	return &client, nil
 }
@@ -38,9 +38,44 @@ func (c *Client) ExecProgram(query map[string]string, ch chan<- StatusResult) {
 	bodyByte, _ := json.Marshal(query)
 	bodyReader := bytes.NewReader(bodyByte)
 
-	req, err := http.NewRequest("POST", c.URL.String(), bodyReader)
+	urlString := c.BaseURL.String() + "create"
+
+	req, err := http.NewRequest("POST", urlString, bodyReader)
 	// TODO: use loglus
-	log.Printf("⚡️  %s\n", c.URL.String())
+	log.Printf("⚡️  %s\n", urlString)
+	if err != nil {
+		result.Err = err
+		ch <- result
+	}
+
+	defer req.Body.Close()
+
+	resp, err := c.HTTPClient.Do(req)
+
+	decoder := json.NewDecoder(resp.Body)
+	var status model.Status
+	err = decoder.Decode(&status)
+	if err != nil {
+		result.Err = err
+		ch <- result
+	}
+
+	result.Response = status
+	ch <- result
+}
+
+// GetStatusRequest is request to get execution status
+func (c *Client) GetStatusRequest(query map[string]string, ch chan<- StatusResult) {
+	result := StatusResult{}
+
+	bodyByte, _ := json.Marshal(query)
+	bodyReader := bytes.NewReader(bodyByte)
+
+	urlString := c.BaseURL.String() + "get_status"
+
+	req, err := http.NewRequest("POST", urlString, bodyReader)
+	// TODO: use loglus
+	log.Printf("⚡️  %s\n", urlString)
 	if err != nil {
 		result.Err = err
 		ch <- result
