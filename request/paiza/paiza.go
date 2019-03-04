@@ -43,6 +43,7 @@ func (c *Client) ExecProgram(query map[string]string, ch chan<- StatusResult) {
 	req, err := http.NewRequest("POST", urlString, bodyReader)
 	// TODO: use loglus
 	log.Printf("⚡️  %s\n", urlString)
+
 	if err != nil {
 		result.Err = err
 		ch <- result
@@ -73,9 +74,10 @@ func (c *Client) GetStatusRequest(query map[string]string, ch chan<- StatusResul
 
 	urlString := c.BaseURL.String() + "get_status"
 
-	req, err := http.NewRequest("POST", urlString, bodyReader)
+	req, err := http.NewRequest("GET", urlString, bodyReader)
 	// TODO: use loglus
 	log.Printf("⚡️  %s\n", urlString)
+
 	if err != nil {
 		result.Err = err
 		ch <- result
@@ -94,5 +96,45 @@ func (c *Client) GetStatusRequest(query map[string]string, ch chan<- StatusResul
 	}
 
 	result.Response = status
+	ch <- result
+}
+
+// ExecutionResult -
+type ExecutionResult struct {
+	Response model.ExecutionResult
+	Err      error
+}
+
+// GetResultRequest is request to get execution result
+func (c *Client) GetResultRequest(query map[string]string, ch chan<- ExecutionResult) {
+	result := ExecutionResult{}
+
+	bodyByte, _ := json.Marshal(query)
+	bodyReader := bytes.NewReader(bodyByte)
+
+	urlString := c.BaseURL.String() + "get_details"
+
+	req, err := http.NewRequest("GET", urlString, bodyReader)
+	// TODO: use loglus
+	log.Printf("⚡️  %s\n", urlString)
+
+	if err != nil {
+		result.Err = err
+		ch <- result
+	}
+
+	defer req.Body.Close()
+
+	resp, err := c.HTTPClient.Do(req)
+
+	decoder := json.NewDecoder(resp.Body)
+	var executionResult model.ExecutionResult
+	err = decoder.Decode(&executionResult)
+	if err != nil {
+		result.Err = err
+		ch <- result
+	}
+
+	result.Response = executionResult
 	ch <- result
 }
