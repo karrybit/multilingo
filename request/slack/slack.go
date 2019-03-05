@@ -1,12 +1,12 @@
 package slack
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"time"
-	"encoding/json"
 
 	"github.com/pkg/errors"
 )
@@ -36,43 +36,44 @@ type Attachment struct {
 }
 
 // NewClient Constructor -
-func NewClient(botUserAccessToken string) (*Client, error) {
-	
+func NewClient(host string, botUserAccessToken string) (*Client, error) {
 	if len(botUserAccessToken) == 0 {
 		return nil, errors.New("missing  botUserAccessToken")
 	}
-	
-	client = Client{botUserAccessToken: botUserAccessToken}
-	client.URL, _ = url.Parse("https://ntj.slack.com/api/chat.postMessage")
-	client.HTTPClient = &http.Client{Timeout: time.Duration(10) * time.Second}
+
+	client := Client{botUserAccessToken: botUserAccessToken,
+		HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
+	client.URL, _ = url.Parse(host + "/api/chat.postMessage")
+
 	return &client, nil
 }
 
-// newRequest -
-func (c *Client) newRequest(method string, body io.Reader) (*http.Request, error) {
+// Notification -
+func (c *Client) Notification(body SlackRequestBody) (*http.Response, error) {
+	bodyByte, _ := json.Marshal(body)
+	bodyReader := bytes.NewReader(bodyByte)
 
-	u := *c.URL
-
-	req, err := http.NewRequest(method, u.String(), body)
+	req, err := c.newRequest("POST", bodyReader)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Content-Type", "Bearer "+c.botUserAccessToken)
+	defer req.Body.Close()
 
-	return req, nil
+	return c.HTTPClient.Do(req)
 }
 
-// Notification -
-func (c *Client) Notification(body SlackRequestBody) {
-	bodyByte, _ = json.Marshal(body)
-	bodyReader := bytes.NewReader(bodyByte)
-	
-	req, _ := c.newRequest("POST", nil, bodyReader)
-    if err != nil {
-		// @TODO: リクエストの作成に失敗したとき
-        return
-    }
+// newRequest -
+func (c *Client) newRequest(method string, body io.Reader) (*http.Request, error) {
+	url := *c.URL
 
-    res, _ := c.HTTPClient.Do(req)
+	req, err := http.NewRequest(method, url.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+c.botUserAccessToken)
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	return req, nil
 }
