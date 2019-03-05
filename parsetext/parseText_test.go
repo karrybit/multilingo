@@ -1,4 +1,4 @@
-package parserawtext
+package parsetext
 
 import "testing"
 

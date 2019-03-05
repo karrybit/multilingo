@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TakumiKaribe/multilingo/parserawtext"
+	"github.com/TakumiKaribe/multilingo/parsetext"
 	"github.com/TakumiKaribe/multilingo/request/paiza"
 	"github.com/TakumiKaribe/multilingo/request/slack"
 	"github.com/aws/aws-lambda-go/events"
@@ -65,7 +65,7 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	}
 
 	// parse program
-	text, err := parserawtext.Parse(requestBody.Event.Text)
+	text, err := parsetext.Parse(requestBody.Event.Text)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
