@@ -1,3 +1,6 @@
 .envrc
 app
 *.exe
+*.zip
+multilingo
+
