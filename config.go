@@ -5,7 +5,7 @@ import "github.com/kelseyhightower/envconfig"
 // Config -
 type Config struct {
 	Debug         bool `default:"false"`
-	LogFormatJson bool `default:"true"  split_words:"true"`
+	LogFormatJSON bool `default:"true"  split_words:"true"`
 	// Authentication token for each language
 	CppToken        string `required:"true" split_words:"true"`
 	CsharpToken     string `required:"true" split_words:"true"`

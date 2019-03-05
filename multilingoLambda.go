@@ -13,16 +13,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// TODO: naming
+// APIGateWayRequest -
 type APIGateWayRequest struct {
 	Token    string `json:"token"`
 	TeamID   string `json:"team_id"`
-	ApiAppID string `json:"api_app_id"`
+	APIAppID string `json:"api_app_id"`
 	Event    Event  `json:"event"`
 }
 
+// Event -
 type Event struct {
-	ClientMsgId    string `json:"client_msg_id"`
+	ClientMsgID    string `json:"client_msg_id"`
 	EventType      string `json:"type"`
 	Text           string `json:"text"`
 	User           string `json:"user"`
@@ -31,6 +32,7 @@ type Event struct {
 	EventTimestamp string `json:"event_ts"`
 }
 
+// LambdaHandler -
 func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Body: %v\n", apiRequest.Headers)
 	fmt.Printf("Body: %v\n", apiRequest.Body)
@@ -60,7 +62,7 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 		log.SetLevel(log.DebugLevel)
 	}
 	// default log format is ASCII
-	if config.LogFormatJson {
+	if config.LogFormatJSON {
 		log.SetFormatter(&log.JSONFormatter{})
 	}
 
