@@ -1,8 +1,9 @@
-package main
+package running
 
 import (
 	"context"
 
+	"github.com/TakumiKaribe/multilingo/config"
 	"github.com/TakumiKaribe/multilingo/model"
 	"github.com/TakumiKaribe/multilingo/request/paiza"
 	"github.com/TakumiKaribe/multilingo/request/slack"
@@ -18,7 +19,7 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	}
 
 	// setup config
-	config, err := newConfig()
+	config, err := config.NewConfig()
 	if err != nil {
 		log.Warn(err.Error())
 	}

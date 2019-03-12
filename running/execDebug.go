@@ -1,4 +1,4 @@
-package main
+package running
 
 import (
 	"github.com/TakumiKaribe/multilingo/model"
@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func execDebug() {
+func ExecDebug() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
 

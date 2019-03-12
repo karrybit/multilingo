@@ -1,4 +1,4 @@
-package main
+package config
 
 import "github.com/kelseyhightower/envconfig"
 
@@ -21,7 +21,8 @@ type Config struct {
 	KotlinToken     string `required:"true" split_words:"true"`
 }
 
-func newConfig() (*Config, error) {
+// NewConfig -
+func NewConfig() (*Config, error) {
 	var config Config
 	err := envconfig.Process("", &config) // env variable like MGO_AUTH_TOKEN
 	if err != nil {
