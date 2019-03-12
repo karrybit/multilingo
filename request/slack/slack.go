@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/TakumiKaribe/multilingo/model"
 	"github.com/pkg/errors"
 )
 
@@ -18,38 +19,22 @@ type Client struct {
 	botUserAccessToken string
 }
 
-// SlackRequestBody -
-type SlackRequestBody struct {
-	Token       string        `json:"token"`
-	Channel     string        `json:"channel"`
-	Attachments []*Attachment `json:"attachments"`
-	UserName    string        `json:"username"`
-}
-
-// Attachment -
-// https://api.slack.com/docs/message-attachments
-type Attachment struct {
-	Color     string `json:"color"` // good or warning or danger or colorcode
-	Title     string `json:"title"`
-	TitleLink string `json:"title_link"`
-	Text      string `json:"text"`
-}
-
 // NewClient Constructor -
 func NewClient(host string, botUserAccessToken string) (*Client, error) {
 	if len(botUserAccessToken) == 0 {
 		return nil, errors.New("missing  botUserAccessToken")
 	}
 
-	client := Client{botUserAccessToken: botUserAccessToken,
-		HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
+	client := Client{botUserAccessToken: botUserAccessToken, HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
 	client.URL, _ = url.Parse(host + "/api/chat.postMessage")
 
 	return &client, nil
 }
 
 // Notification -
-func (c *Client) Notification(body SlackRequestBody) (*http.Response, error) {
+func (c *Client) Notification(body *model.SlackRequestBody, result *model.ExecutionResult) (*http.Response, error) {
+	body.Attachments = *result.MakeAttachments()
+
 	bodyByte, _ := json.Marshal(body)
 	bodyReader := bytes.NewReader(bodyByte)
 

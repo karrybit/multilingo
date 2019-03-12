@@ -55,3 +55,8 @@ func (r *APIGateWayRequest) ConvertProgram() (*Program, error) {
 
 	return &Program{Lang: lang, Program: program}, nil
 }
+
+// ConvertSlackRequestBody -
+func (r *APIGateWayRequest) ConvertSlackRequestBody() *SlackRequestBody {
+	return &SlackRequestBody{Token: r.Token, Channel: r.Event.Channel, UserName: r.Event.User}
+}

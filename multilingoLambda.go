@@ -64,20 +64,13 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	}
 
 	// TODO:
-	slackClient, _ := slack.NewClient("https://hoge/", config.SwiftToken)
+	slackClient, err := slack.NewClient("https://hoge/", config.SwiftToken)
+	if err != nil {
+		log.Warnf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	}
 
-	body := slack.SlackRequestBody{}
-	body.Token = requestBody.Token
-	attachment := slack.Attachment{}
-	attachment.Color = "good"
-	attachment.Title = "Dummy Title"
-	attachment.TitleLink = "https://github.com/TakumiKaribe/multilingo"
-	attachment.Text = "```" + result.Stdout + "```"
-	body.Attachments = append(body.Attachments, &attachment)
-	body.Channel = requestBody.Event.Channel
-	body.UserName = requestBody.Event.User
-
-	resp, err := slackClient.Notification(body)
+	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(), result)
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
