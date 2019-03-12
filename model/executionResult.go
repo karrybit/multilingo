@@ -25,42 +25,80 @@ type ExecutionResult struct {
 	Result        string `json:"result"`
 }
 
+type status string
+type color string
+type title string
+
+const (
+	isSuccess status = "success"
+	isFailure status = "failure"
+	isError   status = "error"
+
+	good    color = "good"
+	warning color = "warning"
+	danger  color = "danger"
+
+	build title = "[BUILD RESULT]"
+	exec  title = "[EXEC RESULT]"
+)
+
 // MakeAttachments -
 func (e *ExecutionResult) MakeAttachments() *[]*Attachment {
 	var attachments []*Attachment
-	if e.BuildResult != "success" {
-		buildFailedText := fmt.Sprintf("status: failed\ntime: %ssec.\nmemory used: %d bytes", e.BuildTime, e.BuildMemory)
-		if len(e.BuildStderr) > 0 {
-			buildFailedText += fmt.Sprintf("\nlog:\n```%s```", e.BuildStderr)
-		}
-		buildFailedAttachment := Attachment{Color: "warning", Title: "Build", Text: buildFailedText}
-		attachments = append(attachments, &buildFailedAttachment)
 
-	} else {
-		buildSucceededText := fmt.Sprintf("status: succeeded\ntime: %ssec\nmemory used: %d bytes", e.BuildTime, e.BuildMemory)
-		if len(e.BuildStdout) > 0 {
-			buildSucceededText += fmt.Sprintf("\nlog:\n```%s```", e.BuildStdout)
-		}
-		buildSucceededAttachment := Attachment{Color: "good", Title: "Build", Text: buildSucceededText}
-		attachments = append(attachments, &buildSucceededAttachment)
+	buildMessage := message{status: status(e.BuildResult), time: e.BuildTime, memory: e.BuildMemory}
+	buildAttachment := Attachment{Title: string(build)}
+	if buildMessage.status == isSuccess {
+		buildMessage.output = e.BuildStdout
+		buildAttachment.Color = string(good)
+		buildAttachment.Text = buildMessage.build()
+		attachments = append(attachments, &buildAttachment)
 
-		if e.Result != "success" {
-			execFailedText := fmt.Sprintf("status: failed\ntime: %ssec\nmemory used: %d bytes", e.Time, e.Memory)
-			if len(e.Stderr) > 0 {
-				execFailedText += fmt.Sprintf("\nlog:\n```%s```", e.Stderr)
-			}
-			attachment := Attachment{Color: "danger", Title: "Exec", Text: execFailedText}
-			attachments = append(attachments, &attachment)
+		execMessage := message{status: status(e.Result), time: e.Time, memory: e.Memory}
+		execAttachment := Attachment{Title: string(exec)}
+		if execMessage.status == isSuccess {
+			execMessage.output = e.Stdout
+			execAttachment.Color = string(good)
+
+		} else if execMessage.status == isFailure {
+			execMessage.output = e.Stderr
+			execAttachment.Color = string(warning)
 
 		} else {
-			execSucceededText := fmt.Sprintf("status: succeeded\ntime: %ssec\nmemory used: %d bytes", e.Time, e.Memory)
-			if len(e.Stdout) > 0 {
-				execSucceededText += fmt.Sprintf("\nlog:\n```%s```", e.Stdout)
-			}
-			attachment := Attachment{Color: "good", Title: "Exec", Text: execSucceededText}
-			attachments = append(attachments, &attachment)
+			execMessage.output = e.Stderr
+			execAttachment.Color = string(danger)
 		}
+
+		execAttachment.Text = execMessage.build()
+		attachments = append(attachments, &execAttachment)
+
+	} else if buildMessage.status == isFailure {
+		buildMessage.output = e.BuildStderr
+		buildAttachment.Color = string(warning)
+		buildAttachment.Text = buildMessage.build()
+		attachments = append(attachments, &buildAttachment)
+
+	} else {
+		buildMessage.output = e.BuildStderr
+		buildAttachment.Color = string(danger)
+		buildAttachment.Text = buildMessage.build()
+		attachments = append(attachments, &buildAttachment)
 	}
 
 	return &attachments
+}
+
+type message struct {
+	status status
+	output string
+	time   string
+	memory int
+}
+
+func (m *message) build() string {
+	text := fmt.Sprintf("result: %s\ntime: %s sec.\nmemory used: %d bytes", m.status, m.time, m.memory)
+	if len(m.output) > 0 {
+		text += fmt.Sprintf("\nlog:\n```%s```", m.output)
+	}
+	return text
 }
