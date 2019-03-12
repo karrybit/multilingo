@@ -1,14 +1,13 @@
 package paiza
 
 import (
-	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/TakumiKaribe/multilingo/request/paiza/model"
+	"github.com/TakumiKaribe/multilingo/model"
+	log "github.com/sirupsen/logrus"
 )
 
 // Client -
@@ -25,119 +24,115 @@ func NewClient() (*Client, error) {
 	return &client, nil
 }
 
-// StatusResult -
-type StatusResult struct {
-	Response model.Status
-	Err      error
+// Request -
+func (c *Client) Request(program *model.Program) (*model.ExecutionResult, error) {
+	status, err := c.execProgram(program)
+	if err != nil {
+		return nil, err
+	}
+
+	// wait execute program until completed
+	for isCompleted := false; isCompleted == false; time.Sleep(1 * time.Second) {
+		isCompleted, err = c.getStatus(status)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return c.getResult(status)
 }
 
 // ExecProgramRequest is request to execute program
-func (c *Client) ExecProgram(lang string, program string, ch chan<- StatusResult) {
-	result := StatusResult{}
+func (c *Client) execProgram(program *model.Program) (*model.Status, error) {
+	query := map[string]string{"language": program.Lang, "api_key": "guest", "source_code": program.Program}
+	values := url.Values{}
+	for k, v := range query {
+		values.Add(k, v)
+	}
 
-	query := map[string]string{"language": lang, "api_key": "guest", "source_code": program}
-	bodyByte, _ := json.Marshal(query)
-	bodyReader := bytes.NewReader(bodyByte)
-
-	urlString := c.BaseURL.String() + "create"
-
-	req, err := http.NewRequest("POST", urlString, bodyReader)
-	// TODO: use loglus
+	urlString := c.BaseURL.String() + "create?" + values.Encode()
+	req, err := http.NewRequest(http.MethodPost, urlString, nil)
 	log.Printf("⚡️  %s\n", urlString)
 
 	if err != nil {
-		result.Err = err
-		ch <- result
+		return nil, err
 	}
 
-	defer req.Body.Close()
-
 	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
 	var status model.Status
 	err = decoder.Decode(&status)
 	if err != nil {
-		result.Err = err
-		ch <- result
+		return nil, err
 	}
 
-	result.Response = status
-	ch <- result
+	return &status, nil
 }
 
 // GetStatusRequest is request to get execution status
-func (c *Client) GetStatusRequest(id string, ch chan<- StatusResult) {
-	result := StatusResult{}
-
-	query := map[string]string{"id": id, "api_key": "guest"}
-	bodyByte, _ := json.Marshal(query)
-	bodyReader := bytes.NewReader(bodyByte)
-
-	urlString := c.BaseURL.String() + "get_status"
-
-	req, err := http.NewRequest("GET", urlString, bodyReader)
-	// TODO: use loglus
-	log.Printf("⚡️  %s\n", urlString)
-
-	if err != nil {
-		result.Err = err
-		ch <- result
+func (c *Client) getStatus(status *model.Status) (bool, error) {
+	query := map[string]string{"id": status.ID, "api_key": "guest"}
+	values := url.Values{}
+	for k, v := range query {
+		values.Add(k, v)
 	}
 
-	defer req.Body.Close()
+	urlString := c.BaseURL.String() + "get_status?" + values.Encode()
 
+	req, err := http.NewRequest(http.MethodGet, urlString, nil)
+	if err != nil {
+		return false, err
+	}
+
+	log.Printf("⚡️  %s\n", urlString)
 	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
-	var status model.Status
-	err = decoder.Decode(&status)
+	err = decoder.Decode(status)
 	if err != nil {
-		result.Err = err
-		ch <- result
+		return false, err
 	}
 
-	result.Response = status
-	ch <- result
-}
-
-// ExecutionResult -
-type ExecutionResult struct {
-	Response model.ExecutionResult
-	Err      error
+	return status.Status == "completed", nil
 }
 
 // GetResultRequest is request to get execution result
-func (c *Client) GetResultRequest(id string, ch chan<- ExecutionResult) {
-	result := ExecutionResult{}
-
-	query := map[string]string{"id": id, "api_key": "guest"}
-	bodyByte, _ := json.Marshal(query)
-	bodyReader := bytes.NewReader(bodyByte)
-
-	urlString := c.BaseURL.String() + "get_details"
-
-	req, err := http.NewRequest("GET", urlString, bodyReader)
-	// TODO: use loglus
-	log.Printf("⚡️  %s\n", urlString)
-
-	if err != nil {
-		result.Err = err
-		ch <- result
+func (c *Client) getResult(status *model.Status) (*model.ExecutionResult, error) {
+	query := map[string]string{"id": status.ID, "api_key": "guest"}
+	values := url.Values{}
+	for k, v := range query {
+		values.Add(k, v)
 	}
 
-	defer req.Body.Close()
+	urlString := c.BaseURL.String() + "get_details?" + values.Encode()
 
+	req, err := http.NewRequest(http.MethodGet, urlString, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("⚡️  %s\n", urlString)
 	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
-	var executionResult model.ExecutionResult
-	err = decoder.Decode(&executionResult)
+	var result model.ExecutionResult
+	err = decoder.Decode(&result)
 	if err != nil {
-		result.Err = err
-		ch <- result
+		return nil, err
 	}
 
-	result.Response = executionResult
-	ch <- result
+	return &result, nil
 }

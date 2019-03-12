@@ -2,41 +2,25 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"time"
 
-	"github.com/TakumiKaribe/multilingo/parsetext"
+	"github.com/TakumiKaribe/multilingo/model"
 	"github.com/TakumiKaribe/multilingo/request/paiza"
 	"github.com/TakumiKaribe/multilingo/request/slack"
 	"github.com/aws/aws-lambda-go/events"
 	log "github.com/sirupsen/logrus"
 )
 
-// APIGateWayRequest -
-type APIGateWayRequest struct {
-	Token    string `json:"token"`
-	TeamID   string `json:"team_id"`
-	APIAppID string `json:"api_app_id"`
-	Event    Event  `json:"event"`
-}
-
-// Event -
-type Event struct {
-	ClientMsgID    string `json:"client_msg_id"`
-	EventType      string `json:"type"`
-	Text           string `json:"text"`
-	User           string `json:"user"`
-	Timestamp      string `json:"ts"`
-	Channel        string `json:"channel"`
-	EventTimestamp string `json:"event_ts"`
-}
-
 // LambdaHandler -
 func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	if val, ok := apiRequest.Headers["X-Slack-Retry-Num"]; val != "" || ok {
+		log.Warnf("X-Slack-Retry-Num is %s", apiRequest.Headers["X-Slack-Retry-Num"])
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	}
+
 	// setup config
 	config, err := newConfig()
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Warn(err.Error())
 	}
 
 	// default level is INFO
@@ -51,61 +35,36 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	log.Debugf("Header: %+v\n", apiRequest.Headers)
 	log.Debugf("Body: %+v\n", apiRequest.Body)
 
-	// parse json
-	var requestBody APIGateWayRequest
-	err = json.Unmarshal([]byte(apiRequest.Body), &requestBody)
+	// decode request
+	requestBody, err := model.NewAPIGateWayRequest([]byte(apiRequest.Body), false)
 	if err != nil {
 		log.Warnf("err: %v\n", err)
-		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	// look up language type
-	lang, err := lookUpLanguage(&requestBody)
+	// init model
+	program, err := requestBody.ConvertProgram()
 	if err != nil {
 		log.Warnf("err: %v\n", err)
-		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	// parse program
-	text, err := parsetext.Parse(requestBody.Event.Text)
-	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
-	}
-
-	// post paiza
+	// init client
 	paizaClient, err := paiza.NewClient()
 	if err != nil {
 		log.Warn(err.Error())
-		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 400}, nil
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	execCh := make(chan paiza.StatusResult)
-	go paizaClient.ExecProgram(lang, text, execCh)
-	execStatus := <-execCh
-	if execStatus.Err != nil {
-		log.Warn(execStatus.Err.Error())
-	}
-	log.Debug(&execStatus.Response)
-
-	// wait execute program until completed
-	for status := "runnig"; status != "completed"; time.Sleep(1 * time.Second) {
-		statusCh := make(chan paiza.StatusResult)
-		go paizaClient.GetStatusRequest(execStatus.Response.ID, statusCh)
-		statusResult := <-statusCh
-		status = statusResult.Response.Status
-	}
-
-	detailCh := make(chan paiza.ExecutionResult)
-	go paizaClient.GetResultRequest(execStatus.Response.ID, detailCh)
-	executionResult := <-detailCh
-
-	if executionResult.Err != nil {
-		log.Warn(executionResult.Err.Error())
+	// post paiza
+	result, err := paizaClient.Request(program)
+	if err != nil {
+		log.Warnf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
 	// TODO:
-	slackClient, _ := slack.NewClient("host", "token")
+	slackClient, _ := slack.NewClient("https://hoge/", config.SwiftToken)
 
 	body := slack.SlackRequestBody{}
 	body.Token = requestBody.Token
@@ -113,14 +72,18 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	attachment.Color = "good"
 	attachment.Title = "Dummy Title"
 	attachment.TitleLink = "https://github.com/TakumiKaribe/multilingo"
-	// TODO:
-	// attachment.Text = result.Response.Stdout
-	attachment.Text = "```" + "ここに実行結果が入るよ" + "```"
+	attachment.Text = "```" + result.Stdout + "```"
 	body.Attachments = append(body.Attachments, &attachment)
 	body.Channel = requestBody.Event.Channel
 	body.UserName = requestBody.Event.User
 
-	slackClient.Notification(body)
+	resp, err := slackClient.Notification(body)
+	if err != nil {
+		log.Warnf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	}
 
-	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 222}, nil
+	log.Println(resp)
+
+	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 }
