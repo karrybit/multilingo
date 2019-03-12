@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"flag"
 
 	"github.com/TakumiKaribe/multilingo/parsetext"
 )
@@ -28,7 +29,8 @@ type Event struct {
 // NewAPIGateWayRequest -
 func NewAPIGateWayRequest(bytes []byte, isDebug bool) (*APIGateWayRequest, error) {
 	if isDebug {
-		event := Event{Text: "<@debug>```print(114514)```", User: "Swift", Channel: "#bot"}
+		flag.Parse()
+		event := Event{Text: "<@debug>```" + flag.Arg(0) + "```", User: "Swift", Channel: "#bot"}
 		request := APIGateWayRequest{Token: "Token", APIAppID: "apiAppID", Event: event}
 		return &request, nil
 	}
