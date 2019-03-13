@@ -2,9 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"flag"
-
-	"github.com/TakumiKaribe/multilingo/parsetext"
 )
 
 // APIGateWayRequest -
@@ -27,35 +24,13 @@ type Event struct {
 }
 
 // NewAPIGateWayRequest -
-func NewAPIGateWayRequest(bytes []byte, isDebug bool) (*APIGateWayRequest, error) {
-	if isDebug {
-		flag.Parse()
-		event := Event{Text: "<@debug>```" + flag.Arg(0) + "```", User: "Swift", Channel: "#bot"}
-		request := APIGateWayRequest{Token: "Token", APIAppID: "apiAppID", Event: event}
-		return &request, nil
-	}
-
+func NewAPIGateWayRequest(bytes []byte) (*APIGateWayRequest, error) {
 	var request APIGateWayRequest
 	err := json.Unmarshal(bytes, &request)
 	if err != nil {
 		return nil, err
 	}
 	return &request, nil
-}
-
-// ConvertProgram -
-func (r *APIGateWayRequest) ConvertProgram() (*Program, error) {
-	lang, err := parsetext.LookUpLanguage(r.APIAppID)
-	if err != nil {
-		return nil, err
-	}
-
-	program, err := parsetext.Parse(r.Event.Text)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Program{Lang: lang, Program: program}, nil
 }
 
 // ConvertSlackRequestBody -

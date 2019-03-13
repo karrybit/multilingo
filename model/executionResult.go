@@ -44,14 +44,7 @@ const (
 func (e *ExecutionResult) MakeAttachments() *[]*Attachment {
 	var attachments []*Attachment
 
-	buildMessage := message{status: status(e.BuildResult), time: e.BuildTime, memory: e.BuildMemory}
-	buildAttachment := Attachment{Title: fmt.Sprintf("[BUILD %s]", strings.ToUpper(e.BuildResult))}
-	if buildMessage.status == isSuccess {
-		buildMessage.output = e.BuildStdout
-		buildAttachment.Color = string(good)
-		buildAttachment.Text = buildMessage.build()
-		attachments = append(attachments, &buildAttachment)
-
+	if e.BuildResult == "" {
 		execMessage := message{status: status(e.Result), time: e.Time, memory: e.Memory}
 		execAttachment := Attachment{Title: fmt.Sprintf("[EXEC %s]", strings.ToUpper(e.Result))}
 		if execMessage.status == isSuccess {
@@ -70,17 +63,45 @@ func (e *ExecutionResult) MakeAttachments() *[]*Attachment {
 		execAttachment.Text = execMessage.build()
 		attachments = append(attachments, &execAttachment)
 
-	} else if buildMessage.status == isFailure {
-		buildMessage.output = e.BuildStderr
-		buildAttachment.Color = string(warning)
-		buildAttachment.Text = buildMessage.build()
-		attachments = append(attachments, &buildAttachment)
-
 	} else {
-		buildMessage.output = e.BuildStderr
-		buildAttachment.Color = string(danger)
-		buildAttachment.Text = buildMessage.build()
-		attachments = append(attachments, &buildAttachment)
+		buildMessage := message{status: status(e.BuildResult), time: e.BuildTime, memory: e.BuildMemory}
+		buildAttachment := Attachment{Title: fmt.Sprintf("[BUILD %s]", strings.ToUpper(e.BuildResult))}
+		if buildMessage.status == isSuccess {
+			buildMessage.output = e.BuildStdout
+			buildAttachment.Color = string(good)
+			buildAttachment.Text = buildMessage.build()
+			attachments = append(attachments, &buildAttachment)
+
+			execMessage := message{status: status(e.Result), time: e.Time, memory: e.Memory}
+			execAttachment := Attachment{Title: fmt.Sprintf("[EXEC %s]", strings.ToUpper(e.Result))}
+			if execMessage.status == isSuccess {
+				execMessage.output = e.Stdout
+				execAttachment.Color = string(good)
+
+			} else if execMessage.status == isFailure {
+				execMessage.output = e.Stderr
+				execAttachment.Color = string(warning)
+
+			} else {
+				execMessage.output = e.Stderr
+				execAttachment.Color = string(danger)
+			}
+
+			execAttachment.Text = execMessage.build()
+			attachments = append(attachments, &execAttachment)
+
+		} else if buildMessage.status == isFailure {
+			buildMessage.output = e.BuildStderr
+			buildAttachment.Color = string(warning)
+			buildAttachment.Text = buildMessage.build()
+			attachments = append(attachments, &buildAttachment)
+
+		} else {
+			buildMessage.output = e.BuildStderr
+			buildAttachment.Color = string(danger)
+			buildAttachment.Text = buildMessage.build()
+			attachments = append(attachments, &buildAttachment)
+		}
 	}
 
 	return &attachments

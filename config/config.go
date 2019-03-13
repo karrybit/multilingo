@@ -1,24 +1,27 @@
 package config
 
-import "github.com/kelseyhightower/envconfig"
+import (
+	"fmt"
+
+	"github.com/kelseyhightower/envconfig"
+)
 
 // Config -
 type Config struct {
 	Debug         bool `default:"false"`
 	LogFormatJSON bool `default:"true"  split_words:"true"`
-	// Authentication token for each language
-	CppToken        string `required:"true" split_words:"true"`
-	CsharpToken     string `required:"true" split_words:"true"`
-	JavaToken       string `required:"true" split_words:"true"`
-	Python3Token    string `required:"true" split_words:"true"`
-	RubyToken       string `required:"true" split_words:"true"`
-	JavascriptToken string `required:"true" split_words:"true"`
-	ScalaToken      string `required:"true" split_words:"true"`
-	GoToken         string `required:"true" split_words:"true"`
-	HaskellToken    string `required:"true" split_words:"true"`
-	RustToken       string `required:"true" split_words:"true"`
-	SwiftToken      string `required:"true" split_words:"true"`
-	KotlinToken     string `required:"true" split_words:"true"`
+
+	// App ID for each language
+	// BashAppID   string `required:"true" split_words:"true"`
+	// CppAppID    string `required:"true" split_words:"true"`
+	PythonAppID string `required:"true" split_words:"true"`
+	SwiftAppID  string `required:"true" split_words:"true"`
+
+	// BotUserOAuthAccessToken for each language
+	// BashOAuthToken   string `required:"true" split_words:"true"`
+	// CppOAuthToken    string `required:"true" split_words:"true"`
+	PythonOAuthToken string `required:"true" split_words:"true"`
+	SwiftOAuthToken  string `required:"true" split_words:"true"`
 }
 
 // NewConfig -
@@ -30,4 +33,28 @@ func NewConfig() (*Config, error) {
 	}
 
 	return &config, nil
+}
+
+// LookUpToken -
+func (c *Config) LookUpToken(id string) (string, error) {
+	switch id {
+	case c.SwiftAppID:
+		return c.SwiftOAuthToken, nil
+	case c.PythonAppID:
+		return c.PythonOAuthToken, nil
+	default:
+		return "", fmt.Errorf("No language corresponding to %s was found", id)
+	}
+}
+
+// LookUpLanguage -
+func (c *Config) LookUpLanguage(id string) (string, error) {
+	switch id {
+	case c.SwiftAppID:
+		return "swift", nil
+	case c.PythonAppID:
+		return "python3", nil
+	default:
+		return "", fmt.Errorf("No language corresponding to %s was found", id)
+	}
 }

@@ -12,14 +12,14 @@ func ExecDebug() {
 	log.SetFormatter(&log.JSONFormatter{})
 
 	// decode request
-	requestBody, err := model.NewAPIGateWayRequest([]byte{}, true)
+	requestBody, err := model.NewAPIGateWayRequest([]byte{})
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return
 	}
 
 	// init slack client
-	slackClient, err := slack.NewClient("https://hoge/", "BotUserAccessToken")
+	slackClient, err := slack.NewClient("https://hoge/", "")
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return

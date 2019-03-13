@@ -5,6 +5,7 @@ import (
 
 	"github.com/TakumiKaribe/multilingo/config"
 	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/parsetext"
 	"github.com/TakumiKaribe/multilingo/request/paiza"
 	"github.com/TakumiKaribe/multilingo/request/slack"
 	"github.com/aws/aws-lambda-go/events"
@@ -37,20 +38,19 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	log.Debugf("Body: %+v\n", apiRequest.Body)
 
 	// decode request
-	requestBody, err := model.NewAPIGateWayRequest([]byte(apiRequest.Body), false)
+	requestBody, err := model.NewAPIGateWayRequest([]byte(apiRequest.Body))
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	slackClient, err := slack.NewClient("https://hoge/", config.SwiftToken)
+	token, err := config.LookUpToken(requestBody.APIAppID)
 	if err != nil {
-		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
+		log.Warnf("err: %v\n", err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	// init model
-	program, err := requestBody.ConvertProgram()
+	slackClient, err := slack.NewClient("https://hoge/", token)
 	if err != nil {
 		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
@@ -63,8 +63,20 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
+	lang, err := config.LookUpLanguage(requestBody.APIAppID)
+	if err != nil {
+		log.Warnf("err: %v\n", err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	}
+
+	program, err := parsetext.Parse(requestBody.Event.Text)
+	if err != nil {
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	}
+
 	// post paiza
-	result, err := paizaClient.Request(program)
+	result, err := paizaClient.Request(&model.Program{Lang: lang, Program: program})
 	if err != nil {
 		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
