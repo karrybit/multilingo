@@ -32,8 +32,8 @@ func NewClient(host string, botUserAccessToken string) (*Client, error) {
 }
 
 // Notification -
-func (c *Client) Notification(body *model.SlackRequestBody, result *model.ExecutionResult) (*http.Response, error) {
-	body.Attachments = *result.MakeAttachments()
+func (c *Client) Notification(body *model.SlackRequestBody, attachments *[]*model.Attachment) (*http.Response, error) {
+	body.Attachments = *attachments
 
 	bodyByte, _ := json.Marshal(body)
 	bodyReader := bytes.NewReader(bodyByte)

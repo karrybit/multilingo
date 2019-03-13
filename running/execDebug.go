@@ -18,37 +18,34 @@ func ExecDebug() {
 		return
 	}
 
-	// init model
-	program, err := requestBody.ConvertProgram()
-	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return
-	}
-
-	// init client
-	paizaClient, err := paiza.NewClient()
-	if err != nil {
-		log.Warn(err.Error())
-		return
-	}
-
-	// post paiza
-	result, err := paizaClient.Request(program)
-	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return
-	}
-
-	log.Printf("%+v", result)
-
-	// TODO:
+	// init slack client
 	slackClient, err := slack.NewClient("https://hoge/", "BotUserAccessToken")
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return
 	}
 
-	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(), result)
+	// init model
+	program, err := requestBody.ConvertProgram()
+	if err != nil {
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
+	}
+
+	// init paiza client
+	paizaClient, err := paiza.NewClient()
+	if err != nil {
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
+	}
+
+	// post paiza
+	result, err := paizaClient.Request(program)
+	if err != nil {
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
+	}
+
+	log.Printf("%+v", result)
+
+	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(), result.MakeAttachments())
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return

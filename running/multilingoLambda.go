@@ -43,41 +43,39 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
+	slackClient, err := slack.NewClient("https://hoge/", config.SwiftToken)
+	if err != nil {
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+	}
+
 	// init model
 	program, err := requestBody.ConvertProgram()
 	if err != nil {
-		log.Warnf("err: %v\n", err)
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
 	// init client
 	paizaClient, err := paiza.NewClient()
 	if err != nil {
-		log.Warn(err.Error())
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
 	// post paiza
 	result, err := paizaClient.Request(program)
 	if err != nil {
-		log.Warnf("err: %v\n", err)
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	// TODO:
-	slackClient, err := slack.NewClient("https://hoge/", config.SwiftToken)
+	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(), result.MakeAttachments())
 	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
-	}
-
-	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(), result)
-	if err != nil {
-		log.Warnf("err: %v\n", err)
+		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
 	log.Println(resp)
-
 	return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 }
