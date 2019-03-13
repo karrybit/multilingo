@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+
+	"github.com/pkg/errors"
 )
 
 // APIGateWayRequestBody -
@@ -28,7 +30,7 @@ func NewAPIGateWayRequestBody(bytes []byte) (*APIGateWayRequestBody, error) {
 	var request APIGateWayRequestBody
 	err := json.Unmarshal(bytes, &request)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed unmarshal APIGateWayRequestBody")
 	}
 	return &request, nil
 }

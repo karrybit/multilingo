@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,25 +18,25 @@ type Client struct {
 }
 
 // NewClient Constructor -
-func NewClient() (*Client, error) {
+func NewClient() *Client {
 	client := Client{HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
 	client.BaseURL, _ = url.Parse("http://api.paiza.io:80/runners/")
 
-	return &client, nil
+	return &client
 }
 
 // Request -
 func (c *Client) Request(program *model.Program) (*model.ExecutionResult, error) {
 	status, err := c.execProgram(program)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to exec program")
 	}
 
 	// wait execute program until completed
 	for isCompleted := false; isCompleted == false; time.Sleep(1 * time.Second) {
 		isCompleted, err = c.getStatus(status)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to get status")
 		}
 	}
 
@@ -55,12 +56,12 @@ func (c *Client) execProgram(program *model.Program) (*model.Status, error) {
 	log.Printf("⚡️  %s\n", urlString)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to init paiza create request")
 	}
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to request paiza create request")
 	}
 	defer resp.Body.Close()
 
@@ -68,7 +69,7 @@ func (c *Client) execProgram(program *model.Program) (*model.Status, error) {
 	var status model.Status
 	err = decoder.Decode(&status)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to decode paiza status")
 	}
 
 	return &status, nil
@@ -86,20 +87,20 @@ func (c *Client) getStatus(status *model.Status) (bool, error) {
 
 	req, err := http.NewRequest(http.MethodGet, urlString, nil)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "failed to init paiza get_status request")
 	}
 
 	log.Printf("⚡️  %s\n", urlString)
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "failed to request paiza get_status request")
 	}
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(status)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "failed to decode paiza status")
 	}
 
 	return status.Status == "completed", nil
@@ -117,13 +118,13 @@ func (c *Client) getResult(status *model.Status) (*model.ExecutionResult, error)
 
 	req, err := http.NewRequest(http.MethodGet, urlString, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to init paiza get_details request")
 	}
 
 	log.Printf("⚡️  %s\n", urlString)
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to request paiza get_details request")
 	}
 	defer resp.Body.Close()
 
@@ -131,7 +132,7 @@ func (c *Client) getResult(status *model.Status) (*model.ExecutionResult, error)
 	var result model.ExecutionResult
 	err = decoder.Decode(&result)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to decode paiza result")
 	}
 
 	return &result, nil

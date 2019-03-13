@@ -40,7 +40,7 @@ func (c *Client) Notification(body *model.SlackRequestBody, attachments *[]*mode
 
 	req, err := c.newRequest("POST", bodyReader)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to init slack request")
 	}
 
 	defer req.Body.Close()
@@ -54,7 +54,7 @@ func (c *Client) newRequest(method string, body io.Reader) (*http.Request, error
 
 	req, err := http.NewRequest(method, url.String(), body)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to init slack request")
 	}
 
 	req.Header.Set("Authorization", "Bearer "+c.botUserAccessToken)

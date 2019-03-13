@@ -31,11 +31,7 @@ func run(requestBody *model.APIGateWayRequestBody) (events.APIGatewayProxyRespon
 	}
 
 	// init paiza client
-	paizaClient, err := paiza.NewClient()
-	if err != nil {
-		noticeError(slackClient, requestBody.ConvertSlackRequestBody(bot), err)
-		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
-	}
+	paizaClient := paiza.NewClient()
 
 	// parse program
 	program, err := parsetext.Parse(requestBody.Event.Text)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/TakumiKaribe/multilingo/model"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 )
 
 // Config -
@@ -39,7 +40,7 @@ func (c *Config) NewBotInfo(id string) (*model.Bot, error) {
 	var config Config
 	err := envconfig.Process("", &config) // env variable like MGO_AUTH_TOKEN
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed load env config")
 	}
 
 	switch id {
