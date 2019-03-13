@@ -3,4 +3,4 @@ app
 *.exe
 *.zip
 multilingo
-
+.env

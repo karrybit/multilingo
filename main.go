@@ -1,14 +1,25 @@
 package main
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/TakumiKaribe/multilingo/running"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/joho/godotenv"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	if false {
-		lambda.Start(running.LambdaHandler)
-	} else {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	if b, _ := strconv.ParseBool(os.Getenv("DEBUG")); b {
 		running.ExecDebug()
+
+	} else {
+		lambda.Start(running.LambdaHandler)
 	}
 }

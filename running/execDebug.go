@@ -1,55 +1,29 @@
 package running
 
 import (
+	"flag"
+	"os"
+
+	"github.com/TakumiKaribe/multilingo/config"
 	"github.com/TakumiKaribe/multilingo/model"
-	"github.com/TakumiKaribe/multilingo/request/paiza"
-	"github.com/TakumiKaribe/multilingo/request/slack"
 	log "github.com/sirupsen/logrus"
 )
 
+// ExecDebug -
 func ExecDebug() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.JSONFormatter{})
 
-	// decode request
-	requestBody, err := model.NewAPIGateWayRequest([]byte{})
+	// setup config
+	config, err := config.NewConfig()
 	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return
+		log.Warn(err.Error())
 	}
 
-	// init slack client
-	slackClient, err := slack.NewClient("https://hoge/", "")
-	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return
-	}
+	// init dummy
+	flag.Parse()
+	event := model.Event{Text: "<@debug>```" + flag.Arg(0) + "```", Channel: os.Getenv("CHANNEL")}
+	requestBody := model.APIGateWayRequestBody{Token: os.Getenv("SWIFT_VERIFICATION_TOKEN"), APIAppID: config.SwiftAppID, Event: event}
 
-	// init model
-	program, err := requestBody.ConvertProgram()
-	if err != nil {
-		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
-	}
-
-	// init paiza client
-	paizaClient, err := paiza.NewClient()
-	if err != nil {
-		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
-	}
-
-	// post paiza
-	result, err := paizaClient.Request(program)
-	if err != nil {
-		noticeError(slackClient, requestBody.ConvertSlackRequestBody(), err)
-	}
-
-	log.Printf("%+v", result)
-
-	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(), result.MakeAttachments())
-	if err != nil {
-		log.Warnf("err: %v\n", err)
-		return
-	}
-
-	log.Println(resp)
+	run(&requestBody)
 }
