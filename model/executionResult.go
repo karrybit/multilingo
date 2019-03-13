@@ -45,79 +45,61 @@ func (e *ExecutionResult) MakeAttachments() *[]*Attachment {
 	var attachments []*Attachment
 
 	if e.BuildResult == "" {
-		execMessage := message{status: status(e.Result), time: e.Time, memory: e.Memory}
-		execAttachment := Attachment{Title: fmt.Sprintf("[EXEC %s]", strings.ToUpper(e.Result))}
-		if execMessage.status == isSuccess {
-			execMessage.output = e.Stdout
-			execAttachment.Color = string(good)
-
-		} else if execMessage.status == isFailure {
-			execMessage.output = e.Stderr
-			execAttachment.Color = string(warning)
-
-		} else {
-			execMessage.output = e.Stderr
-			execAttachment.Color = string(danger)
-		}
-
-		execAttachment.Text = execMessage.build()
-		attachments = append(attachments, &execAttachment)
+		attachments = append(attachments, e.makeExecResultAttachment())
 
 	} else {
-		buildMessage := message{status: status(e.BuildResult), time: e.BuildTime, memory: e.BuildMemory}
-		buildAttachment := Attachment{Title: fmt.Sprintf("[BUILD %s]", strings.ToUpper(e.BuildResult))}
-		if buildMessage.status == isSuccess {
-			buildMessage.output = e.BuildStdout
-			buildAttachment.Color = string(good)
-			buildAttachment.Text = buildMessage.build()
-			attachments = append(attachments, &buildAttachment)
-
-			execMessage := message{status: status(e.Result), time: e.Time, memory: e.Memory}
-			execAttachment := Attachment{Title: fmt.Sprintf("[EXEC %s]", strings.ToUpper(e.Result))}
-			if execMessage.status == isSuccess {
-				execMessage.output = e.Stdout
-				execAttachment.Color = string(good)
-
-			} else if execMessage.status == isFailure {
-				execMessage.output = e.Stderr
-				execAttachment.Color = string(warning)
-
-			} else {
-				execMessage.output = e.Stderr
-				execAttachment.Color = string(danger)
-			}
-
-			execAttachment.Text = execMessage.build()
-			attachments = append(attachments, &execAttachment)
-
-		} else if buildMessage.status == isFailure {
-			buildMessage.output = e.BuildStderr
-			buildAttachment.Color = string(warning)
-			buildAttachment.Text = buildMessage.build()
-			attachments = append(attachments, &buildAttachment)
-
-		} else {
-			buildMessage.output = e.BuildStderr
-			buildAttachment.Color = string(danger)
-			buildAttachment.Text = buildMessage.build()
-			attachments = append(attachments, &buildAttachment)
-		}
+		attachments = *e.makeBuildResultAttachment()
 	}
 
 	return &attachments
 }
 
-type message struct {
-	status status
-	output string
-	time   string
-	memory int
+func (e *ExecutionResult) makeExecResultAttachment() *Attachment {
+	attachment := Attachment{Title: fmt.Sprintf("[EXEC %s]", strings.ToUpper(e.Result))}
+	message := message{status: status(e.Result), time: e.Time, memory: e.Memory}
+
+	if message.status == isSuccess {
+		message.output = e.Stdout
+		attachment.Color = string(good)
+
+	} else if message.status == isFailure {
+		message.output = e.Stderr
+		attachment.Color = string(warning)
+
+	} else {
+		message.output = e.Stderr
+		attachment.Color = string(danger)
+	}
+
+	attachment.Text = message.build()
+	return &attachment
 }
 
-func (m *message) build() string {
-	text := fmt.Sprintf("time: %s sec.\nmemory used: %d bytes", m.time, m.memory)
-	if len(m.output) > 0 {
-		text += fmt.Sprintf("\nlog:\n```%s```", m.output)
+func (e *ExecutionResult) makeBuildResultAttachment() *[]*Attachment {
+	var attachments []*Attachment
+
+	attachment := Attachment{Title: fmt.Sprintf("[BUILD %s]", strings.ToUpper(e.BuildResult))}
+	message := message{status: status(e.BuildResult), time: e.BuildTime, memory: e.BuildMemory}
+
+	if message.status == isSuccess {
+		message.output = e.BuildStdout
+		attachment.Color = string(good)
+
+	} else if message.status == isFailure {
+		message.output = e.BuildStderr
+		attachment.Color = string(warning)
+
+	} else {
+		message.output = e.BuildStderr
+		attachment.Color = string(danger)
 	}
-	return text
+
+	attachment.Text = message.build()
+	attachments = append(attachments, &attachment)
+
+	if message.status == isSuccess {
+		attachments = append(attachments, e.makeExecResultAttachment())
+	}
+
+	return &attachments
 }
