@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 )
 
 // ExecutionResult -
@@ -37,9 +38,6 @@ const (
 	good    color = "good"
 	warning color = "warning"
 	danger  color = "danger"
-
-	build title = "[BUILD RESULT]"
-	exec  title = "[EXEC RESULT]"
 )
 
 // MakeAttachments -
@@ -47,7 +45,7 @@ func (e *ExecutionResult) MakeAttachments() *[]*Attachment {
 	var attachments []*Attachment
 
 	buildMessage := message{status: status(e.BuildResult), time: e.BuildTime, memory: e.BuildMemory}
-	buildAttachment := Attachment{Title: string(build)}
+	buildAttachment := Attachment{Title: string("[BUILD " + strings.ToUpper(e.BuildResult) + "]")}
 	if buildMessage.status == isSuccess {
 		buildMessage.output = e.BuildStdout
 		buildAttachment.Color = string(good)
@@ -55,7 +53,7 @@ func (e *ExecutionResult) MakeAttachments() *[]*Attachment {
 		attachments = append(attachments, &buildAttachment)
 
 		execMessage := message{status: status(e.Result), time: e.Time, memory: e.Memory}
-		execAttachment := Attachment{Title: string(exec)}
+		execAttachment := Attachment{Title: string("[EXEC " + strings.ToUpper(e.Result) + "]")}
 		if execMessage.status == isSuccess {
 			execMessage.output = e.Stdout
 			execAttachment.Color = string(good)
@@ -96,7 +94,7 @@ type message struct {
 }
 
 func (m *message) build() string {
-	text := fmt.Sprintf("result: %s\ntime: %s sec.\nmemory used: %d bytes", m.status, m.time, m.memory)
+	text := fmt.Sprintf("time: %s sec.\nmemory used: %d bytes", m.time, m.memory)
 	if len(m.output) > 0 {
 		text += fmt.Sprintf("\nlog:\n```%s```", m.output)
 	}
