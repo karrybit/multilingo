@@ -4,11 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/TakumiKaribe/multilingo/model"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+)
+
+type endPoint string
+
+const (
+	create    endPoint = "create?"
+	getStatus endPoint = "get_status?"
+	getDetail endPoint = "get_detail?"
 )
 
 // Client -
@@ -51,7 +60,7 @@ func (c *Client) execProgram(program *model.Program) (*model.Status, error) {
 		values.Add(k, v)
 	}
 
-	urlString := c.BaseURL.String() + "create?" + values.Encode()
+	urlString := strings.Join([]string{c.BaseURL.String(), string(create), values.Encode()}, "")
 	req, err := http.NewRequest(http.MethodPost, urlString, nil)
 	log.Printf("⚡️  %s\n", urlString)
 
@@ -83,7 +92,7 @@ func (c *Client) getStatus(status *model.Status) (bool, error) {
 		values.Add(k, v)
 	}
 
-	urlString := c.BaseURL.String() + "get_status?" + values.Encode()
+	urlString := strings.Join([]string{c.BaseURL.String(), string(getStatus), values.Encode()}, "")
 
 	req, err := http.NewRequest(http.MethodGet, urlString, nil)
 	if err != nil {
@@ -114,7 +123,7 @@ func (c *Client) getResult(status *model.Status) (*model.ExecutionResult, error)
 		values.Add(k, v)
 	}
 
-	urlString := c.BaseURL.String() + "get_details?" + values.Encode()
+	urlString := strings.Join([]string{c.BaseURL.String(), string(getDetail), values.Encode()}, "")
 
 	req, err := http.NewRequest(http.MethodGet, urlString, nil)
 	if err != nil {
