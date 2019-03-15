@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/TakumiKaribe/multilingo/running"
+	"github.com/TakumiKaribe/multilingo/application"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
@@ -17,9 +17,9 @@ func main() {
 	}
 
 	if b, _ := strconv.ParseBool(os.Getenv("DEBUG")); b {
-		running.ExecDebug()
+		application.ExecDebug()
 
 	} else {
-		lambda.Start(running.LambdaHandler)
+		lambda.Start(application.LambdaHandler)
 	}
 }

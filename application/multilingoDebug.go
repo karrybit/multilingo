@@ -1,11 +1,11 @@
-package running
+package application
 
 import (
 	"flag"
-	"fmt"
 	"os"
 
-	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/entity"
+	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -20,8 +20,8 @@ func ExecDebug() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	event := model.Event{Text: "<@debug>```" + flag.Arg(0) + "```", Channel: os.Getenv("CHANNEL")}
-	requestBody := model.APIGateWayRequestBody{Token: token, APIAppID: appID, Event: event}
+	event := entity.Event{Text: "<@debug>```" + flag.Arg(0) + "```", Channel: os.Getenv("CHANNEL")}
+	requestBody := entity.APIGateWayRequestBody{Token: token, APIAppID: appID, Event: event}
 
 	run(&requestBody)
 }
@@ -34,6 +34,6 @@ func switchLanguage() (string, string, error) {
 	case "python":
 		return os.Getenv("PYTHON_VERIFICATION_TOKEN"), os.Getenv("PYTHON_APP_ID"), nil
 	default:
-		return "", "", fmt.Errorf("No config corresponding to %s was found", arg)
+		return "", "", multilingoerror.New(multilingoerror.NotFoundConfig, arg, "")
 	}
 }

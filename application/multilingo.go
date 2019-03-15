@@ -1,9 +1,9 @@
-package running
+package application
 
 import (
 	"context"
 
-	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/aws/aws-lambda-go/events"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,7 +22,7 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	log.Debugf("Body: %+v\n", apiRequest.Body)
 
 	// decode request
-	requestBody, err := model.NewAPIGateWayRequestBody([]byte(apiRequest.Body))
+	requestBody, err := entity.NewAPIGateWayRequestBody([]byte(apiRequest.Body))
 	if err != nil {
 		log.Warnf("err: %v\n", err)
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil

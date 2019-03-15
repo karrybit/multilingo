@@ -3,9 +3,8 @@ package config
 import (
 	"fmt"
 
-	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
 )
 
 // Config -
@@ -36,18 +35,12 @@ func NewConfig() (*Config, error) {
 }
 
 // NewBotInfo -
-func (c *Config) NewBotInfo(id string) (*model.Bot, error) {
-	var config Config
-	err := envconfig.Process("", &config) // env variable like MGO_AUTH_TOKEN
-	if err != nil {
-		return nil, errors.Wrap(err, "failed load env config")
-	}
-
+func (c *Config) NewBotInfo(id string) (*entity.Bot, error) {
 	switch id {
-	case config.SwiftAppID:
-		return &model.Bot{Name: "Swift", Token: config.SwiftOauthToken, Language: "swift"}, nil
-	case config.PythonAppID:
-		return &model.Bot{Name: "Python", Token: config.PythonOauthToken, Language: "python3"}, nil
+	case c.SwiftAppID:
+		return &entity.Bot{Name: "Swift", Token: c.SwiftOauthToken, Language: "swift"}, nil
+	case c.PythonAppID:
+		return &entity.Bot{Name: "Python", Token: c.PythonOauthToken, Language: "python3"}, nil
 	default:
 		return nil, fmt.Errorf("No bot corresponding to %s was found", id)
 	}

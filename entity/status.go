@@ -1,4 +1,4 @@
-package model
+package entity
 
 // Status -
 type Status struct {

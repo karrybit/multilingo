@@ -1,4 +1,4 @@
-package model
+package entity
 
 // Program -
 type Program struct {

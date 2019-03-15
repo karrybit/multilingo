@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/TakumiKaribe/multilingo/model"
+	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/pkg/errors"
 )
 
@@ -32,7 +32,7 @@ func NewClient(host string, botUserAccessToken string) (*Client, error) {
 }
 
 // Notification -
-func (c *Client) Notification(body *model.SlackRequestBody) (*http.Response, error) {
+func (c *Client) Notification(body *entity.SlackRequestBody) (*http.Response, error) {
 	bodyByte, _ := json.Marshal(body)
 	bodyReader := bytes.NewReader(bodyByte)
 
