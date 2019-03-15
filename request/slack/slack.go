@@ -32,9 +32,7 @@ func NewClient(host string, botUserAccessToken string) (*Client, error) {
 }
 
 // Notification -
-func (c *Client) Notification(body *model.SlackRequestBody, attachments *[]*model.Attachment) (*http.Response, error) {
-	body.Attachments = *attachments
-
+func (c *Client) Notification(body *model.SlackRequestBody) (*http.Response, error) {
 	bodyByte, _ := json.Marshal(body)
 	bodyReader := bytes.NewReader(bodyByte)
 

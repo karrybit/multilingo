@@ -48,7 +48,9 @@ func run(requestBody *model.APIGateWayRequestBody) (events.APIGatewayProxyRespon
 	}
 
 	// post slack
-	resp, err := slackClient.Notification(requestBody.ConvertSlackRequestBody(bot), result.MakeAttachments())
+	body := requestBody.ConvertSlackRequestBody(bot)
+	body.Attachments = *result.MakeAttachments()
+	resp, err := slackClient.Notification(body)
 	if err != nil {
 		noticeError(slackClient, requestBody.ConvertSlackRequestBody(bot), err)
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
