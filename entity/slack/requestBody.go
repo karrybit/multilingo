@@ -1,7 +1,7 @@
-package entity
+package slack
 
-// SlackRequestBody -
-type SlackRequestBody struct {
+// RequestBody -
+type RequestBody struct {
 	Token       string        `json:"token"`
 	Channel     string        `json:"channel"`
 	Attachments []*Attachment `json:"attachments"`

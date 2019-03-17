@@ -34,8 +34,3 @@ func NewAPIGateWayRequestBody(bytes []byte) (*APIGateWayRequestBody, error) {
 	}
 	return &request, nil
 }
-
-// ConvertSlackRequestBody -
-func (r *APIGateWayRequestBody) ConvertSlackRequestBody(bot *Bot) *SlackRequestBody {
-	return &SlackRequestBody{Token: r.Token, Channel: r.Event.Channel, UserName: bot.Name}
-}

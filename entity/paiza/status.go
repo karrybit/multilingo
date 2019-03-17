@@ -1,4 +1,4 @@
-package entity
+package paiza
 
 // Status -
 type Status struct {

@@ -1,4 +1,4 @@
-package entity
+package slack
 
 // Bot -
 type Bot struct {

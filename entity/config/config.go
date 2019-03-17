@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/TakumiKaribe/multilingo/entity"
+	"github.com/TakumiKaribe/multilingo/entity/slack"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -35,12 +35,12 @@ func NewConfig() (*Config, error) {
 }
 
 // NewBotInfo -
-func (c *Config) NewBotInfo(id string) (*entity.Bot, error) {
+func (c *Config) NewBotInfo(id string) (*slack.Bot, error) {
 	switch id {
 	case c.SwiftAppID:
-		return &entity.Bot{Name: "Swift", Token: c.SwiftOauthToken, Language: "swift"}, nil
+		return &slack.Bot{Name: "Swift", Token: c.SwiftOauthToken, Language: "swift"}, nil
 	case c.PythonAppID:
-		return &entity.Bot{Name: "Python", Token: c.PythonOauthToken, Language: "python3"}, nil
+		return &slack.Bot{Name: "Python", Token: c.PythonOauthToken, Language: "python3"}, nil
 	default:
 		return nil, fmt.Errorf("No bot corresponding to %s was found", id)
 	}

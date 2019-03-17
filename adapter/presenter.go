@@ -3,13 +3,16 @@ package adapter
 import (
 	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/TakumiKaribe/multilingo/entity/config"
-	"github.com/TakumiKaribe/multilingo/infrastructure/request/slack"
+	"github.com/TakumiKaribe/multilingo/entity/paiza"
+	entitySlack "github.com/TakumiKaribe/multilingo/entity/slack"
+	requestSlack "github.com/TakumiKaribe/multilingo/infrastructure/request/slack"
+	"github.com/TakumiKaribe/multilingo/usecase/interactor/buildMessage"
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
 )
 
 type Presenter struct {
-	client *slack.Client
-	bot    *entity.Bot
+	client interfaces.SlackClient
+	bot    *entitySlack.Bot
 	body   *entity.APIGateWayRequestBody
 }
 
@@ -21,7 +24,7 @@ func NewPresenter(config *config.Config, body *entity.APIGateWayRequestBody) (in
 	}
 	presenter.bot = bot
 	presenter.body = body
-	client, err := slack.NewClient(config.SlackPath, bot.Token)
+	client, err := requestSlack.NewClient(config.SlackPath, bot.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -29,9 +32,9 @@ func NewPresenter(config *config.Config, body *entity.APIGateWayRequestBody) (in
 	return &presenter, nil
 }
 
-func (p *Presenter) ShowResult(result *entity.ExecutionResult) {
-	requestBody := p.body.ConvertSlackRequestBody(p.bot)
-	requestBody.Attachments = *result.MakeAttachments()
+func (p *Presenter) ShowResult(result *paiza.Result) {
+	requestBody := p.makeSlackRequestBody()
+	requestBody.Attachments = *buildMessage.MakeMessage(result)
 
 	p.client.Notify(requestBody)
 }
@@ -43,9 +46,13 @@ func (p *Presenter) LeaveChannel() {
 }
 
 func (p *Presenter) ShowError(err error) {
-	requestBody := p.body.ConvertSlackRequestBody(p.bot)
-	attachments := append([]*entity.Attachment{}, &entity.Attachment{Color: "danger", Title: "[ERROR]", Text: err.Error()})
+	requestBody := p.makeSlackRequestBody()
+	attachments := append([]*entitySlack.Attachment{}, &entitySlack.Attachment{Color: "danger", Title: "[ERROR]", Text: err.Error()})
 	requestBody.Attachments = attachments
 
 	p.client.Notify(requestBody)
+}
+
+func (p *Presenter) makeSlackRequestBody() *entitySlack.RequestBody {
+	return &entitySlack.RequestBody{Token: p.body.Token, Channel: p.body.Event.Channel, UserName: p.bot.Name}
 }

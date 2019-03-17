@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/TakumiKaribe/multilingo/entity/paiza"
+	"github.com/TakumiKaribe/multilingo/entity/slack"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,4 +44,12 @@ func (r *Reqeuster) Request(method Method, urlString string, body io.Reader, hea
 	}
 
 	return resp.Body, nil
+}
+
+type PaizaClient interface {
+	Request(string, string) (*paiza.Result, error)
+}
+
+type SlackClient interface {
+	Notify(*slack.RequestBody) error
 }

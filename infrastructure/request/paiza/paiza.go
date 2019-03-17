@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TakumiKaribe/multilingo/entity"
+	"github.com/TakumiKaribe/multilingo/entity/paiza"
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
 )
 
@@ -17,21 +17,21 @@ const (
 	getDetail = "get_details?"
 )
 
-type Client struct {
+type client struct {
 	requester     *interfaces.Reqeuster
 	baseURL       *url.URL
 	defaultParams url.Values
 }
 
-func NewClient() *Client {
-	client := Client{requester: interfaces.NewRequester()}
+func NewClient() interfaces.PaizaClient {
+	client := client{requester: interfaces.NewRequester()}
 	client.baseURL, _ = url.Parse(baseURL)
 	client.defaultParams = url.Values{}
 	client.defaultParams.Add("api_key", "guest")
 	return &client
 }
 
-func (c *Client) Request(language string, program string) (*entity.ExecutionResult, error) {
+func (c *client) Request(language string, program string) (*paiza.Result, error) {
 	status, err := c.create(language, program)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (c *Client) Request(language string, program string) (*entity.ExecutionResu
 	return c.getDetail(status.ID)
 }
 
-func (c *Client) create(language string, program string) (*entity.Status, error) {
+func (c *client) create(language string, program string) (*paiza.Status, error) {
 	params := c.defaultParams
 	params.Add("language", language)
 	params.Add("source_code", program)
@@ -61,7 +61,7 @@ func (c *Client) create(language string, program string) (*entity.Status, error)
 
 	defer body.Close()
 	decoder := json.NewDecoder(body)
-	var status entity.Status
+	var status paiza.Status
 	err = decoder.Decode(&status)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (c *Client) create(language string, program string) (*entity.Status, error)
 	return &status, nil
 }
 
-func (c *Client) getStatus(status *entity.Status) (*entity.Status, error) {
+func (c *client) getStatus(status *paiza.Status) (*paiza.Status, error) {
 	params := c.defaultParams
 	params.Add("id", status.ID)
 
@@ -87,7 +87,7 @@ func (c *Client) getStatus(status *entity.Status) (*entity.Status, error) {
 	return status, nil
 }
 
-func (c *Client) getDetail(id string) (*entity.ExecutionResult, error) {
+func (c *client) getDetail(id string) (*paiza.Result, error) {
 	params := c.defaultParams
 	params.Add("id", id)
 
@@ -97,7 +97,7 @@ func (c *Client) getDetail(id string) (*entity.ExecutionResult, error) {
 	defer body.Close()
 	decoder := json.NewDecoder(body)
 
-	var result entity.ExecutionResult
+	var result paiza.Result
 	err = decoder.Decode(&result)
 	if err != nil {
 		return nil, err
