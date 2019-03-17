@@ -3,10 +3,8 @@ package adapter
 import (
 	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/TakumiKaribe/multilingo/entity/config"
-	"github.com/TakumiKaribe/multilingo/entity/paiza"
 	entitySlack "github.com/TakumiKaribe/multilingo/entity/slack"
 	requestSlack "github.com/TakumiKaribe/multilingo/infrastructure/request/slack"
-	"github.com/TakumiKaribe/multilingo/usecase/interactor/buildMessage"
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
 	interfaceSlack "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/slack"
 )
@@ -33,9 +31,9 @@ func NewPresenter(config *config.Config, body *entity.APIGateWayRequestBody) (in
 	return &presenter, nil
 }
 
-func (p *Presenter) ShowResult(result *paiza.Result) {
+func (p *Presenter) ShowResult(attachments *[]*entitySlack.Attachment) {
 	requestBody := p.makeSlackRequestBody()
-	requestBody.Attachments = *buildMessage.MakeMessage(result)
+	requestBody.Attachments = *attachments
 
 	p.client.Notify(requestBody)
 }

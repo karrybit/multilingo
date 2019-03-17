@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"github.com/TakumiKaribe/multilingo/infrastructure/request/paiza"
+	"github.com/TakumiKaribe/multilingo/usecase/interactor/buildMessage"
 	"github.com/TakumiKaribe/multilingo/usecase/interactor/parsetext"
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
 )
@@ -29,7 +30,8 @@ func (i *Interactor) ExecProgram(language string, text string) error {
 		return err
 	}
 
-	i.presenter.ShowResult(result)
+	i.presenter.ShowResult(buildMessage.MakeMessage(result))
+
 	return nil
 }
 

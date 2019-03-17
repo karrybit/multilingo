@@ -1,9 +1,9 @@
 package interfaces
 
-import "github.com/TakumiKaribe/multilingo/entity/paiza"
+import "github.com/TakumiKaribe/multilingo/entity/slack"
 
 type Presenter interface {
-	ShowResult(*paiza.Result)
+	ShowResult(*[]*slack.Attachment)
 	Challenge()
 	LeaveChannel()
 	ShowError(error)
