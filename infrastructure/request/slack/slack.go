@@ -3,60 +3,51 @@ package slack
 import (
 	"bytes"
 	"encoding/json"
-	"io"
-	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/TakumiKaribe/multilingo/entity"
+	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
+
 	"github.com/pkg/errors"
+)
+
+const (
+	postMessage = "/api/chat.postMessage"
 )
 
 // Client -
 type Client struct {
-	URL                *url.URL
-	HTTPClient         *http.Client
+	url                *url.URL
+	requester          *interfaces.Reqeuster
 	botUserAccessToken string
 }
 
 // NewClient Constructor -
 func NewClient(host string, botUserAccessToken string) (*Client, error) {
 	if len(botUserAccessToken) == 0 {
+		// TODO: use multilingo error
 		return nil, errors.New("missing  botUserAccessToken")
 	}
 
-	client := Client{botUserAccessToken: botUserAccessToken, HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
-	client.URL, _ = url.Parse(host + "/api/chat.postMessage")
+	client := Client{botUserAccessToken: botUserAccessToken, requester: interfaces.NewRequester()}
+	client.url, _ = url.Parse(host + postMessage)
 
 	return &client, nil
 }
 
 // Notification -
-func (c *Client) Notification(body *entity.SlackRequestBody) (*http.Response, error) {
-	bodyByte, _ := json.Marshal(body)
+func (c *Client) Notify(requestBody *entity.SlackRequestBody) error {
+	bodyByte, _ := json.Marshal(requestBody)
 	bodyReader := bytes.NewReader(bodyByte)
 
-	req, err := c.newRequest("POST", bodyReader)
+	header := map[string]string{}
+	header["Authorization"] = "Bearer " + c.botUserAccessToken
+	header["Content-Type"] = "application/json; charset=UTF-8"
+	body, err := c.requester.Request(interfaces.Post, c.url.String(), bodyReader, header)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to init slack request")
+		return err
 	}
 
-	defer req.Body.Close()
-
-	return c.HTTPClient.Do(req)
-}
-
-// newRequest -
-func (c *Client) newRequest(method string, body io.Reader) (*http.Request, error) {
-	url := *c.URL
-
-	req, err := http.NewRequest(method, url.String(), body)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to init slack request")
-	}
-
-	req.Header.Set("Authorization", "Bearer "+c.botUserAccessToken)
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
-	return req, nil
+	defer body.Close()
+	return nil
 }

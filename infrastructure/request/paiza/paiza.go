@@ -2,148 +2,105 @@ package paiza
 
 import (
 	"encoding/json"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/TakumiKaribe/multilingo/entity"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
 )
-
-type endPoint string
 
 const (
-	create    endPoint = "create?"
-	getStatus endPoint = "get_status?"
-	getDetail endPoint = "get_details?"
+	baseURL   = "http://api.paiza.io:80/runners/"
+	create    = "create?"
+	getStatus = "get_status?"
+	getDetail = "get_details?"
 )
 
-// Client -
 type Client struct {
-	BaseURL    *url.URL
-	HTTPClient *http.Client
+	requester     *interfaces.Reqeuster
+	baseURL       *url.URL
+	defaultParams url.Values
 }
 
-// NewClient Constructor -
 func NewClient() *Client {
-	client := Client{HTTPClient: &http.Client{Timeout: time.Duration(10) * time.Second}}
-	client.BaseURL, _ = url.Parse("http://api.paiza.io:80/runners/")
-
+	client := Client{requester: interfaces.NewRequester()}
+	client.baseURL, _ = url.Parse(baseURL)
+	client.defaultParams = url.Values{}
+	client.defaultParams.Add("api_key", "guest")
 	return &client
 }
 
-// Request -
-func (c *Client) Request(program *entity.Program) (*entity.ExecutionResult, error) {
-	status, err := c.execProgram(program)
+func (c *Client) Request(language string, program string) (*entity.ExecutionResult, error) {
+	status, err := c.create(language, program)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to exec program")
+		return nil, err
 	}
 
-	// wait execute program until completed
-	for isCompleted := false; isCompleted == false; time.Sleep(1 * time.Second) {
-		isCompleted, err = c.getStatus(status)
+	for ; status.Status != "completed"; time.Sleep(1 * time.Second) {
+		status, err = c.getStatus(status)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get status")
+			return nil, err
 		}
 	}
 
-	return c.getResult(status)
+	return c.getDetail(status.ID)
 }
 
-// ExecProgramRequest is request to execute program
-func (c *Client) execProgram(program *entity.Program) (*entity.Status, error) {
-	query := map[string]string{"language": program.Lang, "api_key": "guest", "source_code": program.Program}
-	values := url.Values{}
-	for k, v := range query {
-		values.Add(k, v)
-	}
+func (c *Client) create(language string, program string) (*entity.Status, error) {
+	params := c.defaultParams
+	params.Add("language", language)
+	params.Add("source_code", program)
 
-	urlString := strings.Join([]string{c.BaseURL.String(), string(create), values.Encode()}, "")
-	req, err := http.NewRequest(http.MethodPost, urlString, nil)
-	log.Printf("⚡️  %s", urlString)
+	urlString := strings.Join([]string{c.baseURL.String(), create, params.Encode()}, "")
 
+	body, err := c.requester.Request(interfaces.Post, urlString, nil, map[string]string{})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to init paiza create request")
+		return nil, err
 	}
 
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to request paiza create request")
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
+	defer body.Close()
+	decoder := json.NewDecoder(body)
 	var status entity.Status
 	err = decoder.Decode(&status)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to decode paiza status")
+		return nil, err
 	}
 
 	return &status, nil
 }
 
-// GetStatusRequest is request to get execution status
-func (c *Client) getStatus(status *entity.Status) (bool, error) {
-	query := map[string]string{"id": status.ID, "api_key": "guest"}
-	values := url.Values{}
-	for k, v := range query {
-		values.Add(k, v)
-	}
+func (c *Client) getStatus(status *entity.Status) (*entity.Status, error) {
+	params := c.defaultParams
+	params.Add("id", status.ID)
 
-	urlString := strings.Join([]string{c.BaseURL.String(), string(getStatus), values.Encode()}, "")
+	urlString := strings.Join([]string{c.baseURL.String(), getStatus, params.Encode()}, "")
+	body, err := c.requester.Request(interfaces.Get, urlString, nil, map[string]string{})
 
-	req, err := http.NewRequest(http.MethodGet, urlString, nil)
-	if err != nil {
-		return false, errors.Wrap(err, "failed to init paiza get_status request")
-	}
-
-	log.Printf("⚡️  %s", urlString)
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return false, errors.Wrap(err, "failed to request paiza get_status request")
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
+	defer body.Close()
+	decoder := json.NewDecoder(body)
 	err = decoder.Decode(status)
 	if err != nil {
-		return false, errors.Wrap(err, "failed to decode paiza status")
+		return nil, err
 	}
 
-	return status.Status == "completed", nil
+	return status, nil
 }
 
-// GetResultRequest is request to get execution result
-func (c *Client) getResult(status *entity.Status) (*entity.ExecutionResult, error) {
-	query := map[string]string{"id": status.ID, "api_key": "guest"}
-	values := url.Values{}
-	for k, v := range query {
-		values.Add(k, v)
-	}
+func (c *Client) getDetail(id string) (*entity.ExecutionResult, error) {
+	params := c.defaultParams
+	params.Add("id", id)
 
-	urlString := strings.Join([]string{c.BaseURL.String(), string(getDetail), values.Encode()}, "")
+	urlString := strings.Join([]string{c.baseURL.String(), getDetail, params.Encode()}, "")
+	body, err := c.requester.Request(interfaces.Get, urlString, nil, map[string]string{})
 
-	req, err := http.NewRequest(http.MethodGet, urlString, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to init paiza get_details request")
-	}
+	defer body.Close()
+	decoder := json.NewDecoder(body)
 
-	log.Printf("⚡️  %s", urlString)
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to request paiza get_details request")
-	}
-	defer resp.Body.Close()
-
-	log.Println(resp.Body)
-
-	decoder := json.NewDecoder(resp.Body)
 	var result entity.ExecutionResult
 	err = decoder.Decode(&result)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to decode paiza result")
+		return nil, err
 	}
 
 	return &result, nil
