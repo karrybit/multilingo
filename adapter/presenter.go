@@ -8,10 +8,11 @@ import (
 	requestSlack "github.com/TakumiKaribe/multilingo/infrastructure/request/slack"
 	"github.com/TakumiKaribe/multilingo/usecase/interactor/buildMessage"
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
+	interfaceSlack "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/slack"
 )
 
 type Presenter struct {
-	client interfaces.SlackClient
+	client interfaceSlack.Client
 	bot    *entitySlack.Bot
 	body   *entity.APIGateWayRequestBody
 }

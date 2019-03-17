@@ -6,7 +6,9 @@ import (
 	"net/url"
 
 	"github.com/TakumiKaribe/multilingo/entity/slack"
-	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
+	infraRequest "github.com/TakumiKaribe/multilingo/infrastructure/request"
+	interfacesRequest "github.com/TakumiKaribe/multilingo/usecase/interfaces/request"
+	requestSlack "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/slack"
 
 	"github.com/pkg/errors"
 )
@@ -18,18 +20,18 @@ const (
 // Client -
 type client struct {
 	url                *url.URL
-	requester          *interfaces.Reqeuster
+	requester          *infraRequest.Reqeuster
 	botUserAccessToken string
 }
 
 // NewClient Constructor -
-func NewClient(host string, botUserAccessToken string) (interfaces.SlackClient, error) {
+func NewClient(host string, botUserAccessToken string) (requestSlack.Client, error) {
 	if len(botUserAccessToken) == 0 {
 		// TODO: use multilingo error
 		return nil, errors.New("missing  botUserAccessToken")
 	}
 
-	client := client{botUserAccessToken: botUserAccessToken, requester: interfaces.NewRequester()}
+	client := client{botUserAccessToken: botUserAccessToken, requester: infraRequest.NewRequester()}
 	client.url, _ = url.Parse(host + postMessage)
 
 	return &client, nil
@@ -43,7 +45,7 @@ func (c *client) Notify(requestBody *slack.RequestBody) error {
 	header := map[string]string{}
 	header["Authorization"] = "Bearer " + c.botUserAccessToken
 	header["Content-Type"] = "application/json; charset=UTF-8"
-	body, err := c.requester.Request(interfaces.Post, c.url.String(), bodyReader, header)
+	body, err := c.requester.Request(interfacesRequest.Post, c.url.String(), bodyReader, header)
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/TakumiKaribe/multilingo/entity/paiza"
-	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
+	infraRequest "github.com/TakumiKaribe/multilingo/infrastructure/request"
+	interfacesRequest "github.com/TakumiKaribe/multilingo/usecase/interfaces/request"
+	requestPaiza "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/paiza"
 )
 
 const (
@@ -18,13 +20,13 @@ const (
 )
 
 type client struct {
-	requester     *interfaces.Reqeuster
+	requester     *infraRequest.Reqeuster
 	baseURL       *url.URL
 	defaultParams url.Values
 }
 
-func NewClient() interfaces.PaizaClient {
-	client := client{requester: interfaces.NewRequester()}
+func NewClient() requestPaiza.Client {
+	client := client{requester: infraRequest.NewRequester()}
 	client.baseURL, _ = url.Parse(baseURL)
 	client.defaultParams = url.Values{}
 	client.defaultParams.Add("api_key", "guest")
@@ -54,7 +56,7 @@ func (c *client) create(language string, program string) (*paiza.Status, error) 
 
 	urlString := strings.Join([]string{c.baseURL.String(), create, params.Encode()}, "")
 
-	body, err := c.requester.Request(interfaces.Post, urlString, nil, map[string]string{})
+	body, err := c.requester.Request(interfacesRequest.Post, urlString, nil, map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +77,7 @@ func (c *client) getStatus(status *paiza.Status) (*paiza.Status, error) {
 	params.Add("id", status.ID)
 
 	urlString := strings.Join([]string{c.baseURL.String(), getStatus, params.Encode()}, "")
-	body, err := c.requester.Request(interfaces.Get, urlString, nil, map[string]string{})
+	body, err := c.requester.Request(interfacesRequest.Get, urlString, nil, map[string]string{})
 
 	defer body.Close()
 	decoder := json.NewDecoder(body)
@@ -92,7 +94,7 @@ func (c *client) getDetail(id string) (*paiza.Result, error) {
 	params.Add("id", id)
 
 	urlString := strings.Join([]string{c.baseURL.String(), getDetail, params.Encode()}, "")
-	body, err := c.requester.Request(interfaces.Get, urlString, nil, map[string]string{})
+	body, err := c.requester.Request(interfacesRequest.Get, urlString, nil, map[string]string{})
 
 	defer body.Close()
 	decoder := json.NewDecoder(body)
