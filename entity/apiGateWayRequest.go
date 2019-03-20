@@ -8,10 +8,11 @@ import (
 
 // APIGateWayRequestBody -
 type APIGateWayRequestBody struct {
-	Token    string `json:"token"`
-	TeamID   string `json:"team_id"`
-	APIAppID string `json:"api_app_id"`
-	Event    Event  `json:"event"`
+	Token     string `json:"token"`
+	TeamID    string `json:"team_id"`
+	APIAppID  string `json:"api_app_id"`
+	Event     Event  `json:"event"`
+	Challenge string `json:"challenge"`
 }
 
 // Event -

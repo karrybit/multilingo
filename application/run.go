@@ -9,6 +9,12 @@ import (
 )
 
 func run(requestBody *entity.APIGateWayRequestBody) (events.APIGatewayProxyResponse, error) {
+	if requestBody.Challenge != "" {
+		response := events.APIGatewayProxyResponse{StatusCode: 200}
+		response.Body = requestBody.Challenge
+		return response, nil
+	}
+
 	// setup config
 	config, err := config.NewConfig()
 	if err != nil {
