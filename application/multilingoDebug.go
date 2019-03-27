@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/TakumiKaribe/multilingo/entity"
+	"github.com/TakumiKaribe/multilingo/entity/config"
 	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,9 +31,9 @@ func switchLanguage() (string, string, error) {
 	arg := flag.Arg(1)
 	switch arg {
 	case "swift":
-		return os.Getenv("SWIFT_VERIFICATION_TOKEN"), os.Getenv("SWIFT_APP_ID"), nil
+		return config.SharedConfig.DebugConfig.SwiftVerificationToken, config.SharedConfig.SwiftAppID, nil
 	case "python":
-		return os.Getenv("PYTHON_VERIFICATION_TOKEN"), os.Getenv("PYTHON_APP_ID"), nil
+		return config.SharedConfig.DebugConfig.PythonVerificationToken, config.SharedConfig.PythonAppID, nil
 	default:
 		return "", "", multilingoerror.New(multilingoerror.NotFoundConfig, arg, "")
 	}

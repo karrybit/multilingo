@@ -7,8 +7,13 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+// SharedConfig -
+var SharedConfig *config
+
 // Config -
-type Config struct {
+type config struct {
+	Debug bool `default:"true"`
+
 	SlackPath string `required:"true" split_words:"true"`
 	// App ID for each language
 	// BashAppID   string `required:"true" split_words:"true"`
@@ -21,21 +26,46 @@ type Config struct {
 	// CppOAuthToken    string `required:"true" split_words:"true"`
 	PythonOauthToken string `required:"true" split_words:"true"`
 	SwiftOauthToken  string `required:"true" split_words:"true"`
+
+	DebugConfig *debugConfig `required:"false"`
 }
 
-// NewConfig -
-func NewConfig() (*Config, error) {
-	var config Config
-	err := envconfig.Process("", &config) // env variable like MGO_AUTH_TOKEN
-	if err != nil {
-		return nil, err
+// DebugConfig -
+type debugConfig struct {
+	Channel                 string `required:"false"`
+	PythonVerificationToken string `required:"false" split_words:"true"`
+	SwiftVerificationToken  string `required:"false" split_words:"true"`
+}
+
+// Load -
+func Load() error {
+	if SharedConfig != nil {
+		return nil
 	}
 
-	return &config, nil
+	var _config config
+	err := envconfig.Process("", &_config) // env variable like MGO_AUTH_TOKEN
+	if err != nil {
+		return err
+	}
+
+	if _config.Debug {
+		var _debugConfig debugConfig
+		err := envconfig.Process("", &_debugConfig) // env variable like MGO_AUTH_TOKEN
+		if err != nil {
+			return err
+		}
+
+		_config.DebugConfig = &_debugConfig
+	}
+
+	SharedConfig = &_config
+
+	return nil
 }
 
 // NewBotInfo -
-func (c *Config) NewBotInfo(id string) (*slack.Bot, error) {
+func (c *config) NewBotInfo(id string) (*slack.Bot, error) {
 	switch id {
 	case c.SwiftAppID:
 		return &slack.Bot{Name: "Swift", Token: c.SwiftOauthToken, Language: "swift"}, nil

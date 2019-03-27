@@ -15,15 +15,15 @@ type Presenter struct {
 	body   *entity.APIGateWayRequestBody
 }
 
-func NewPresenter(config *config.Config, body *entity.APIGateWayRequestBody) (interfaces.Presenter, error) {
+func NewPresenter(body *entity.APIGateWayRequestBody) (interfaces.Presenter, error) {
 	presenter := Presenter{}
-	bot, err := config.NewBotInfo(body.APIAppID)
+	bot, err := config.SharedConfig.NewBotInfo(body.APIAppID)
 	if err != nil {
 		return nil, err
 	}
 	presenter.bot = bot
 	presenter.body = body
-	client, err := requestSlack.NewClient(config.SlackPath, bot.Token)
+	client, err := requestSlack.NewClient(config.SharedConfig.SlackPath, bot.Token)
 	if err != nil {
 		return nil, err
 	}
