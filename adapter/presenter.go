@@ -9,12 +9,14 @@ import (
 	interfaceSlack "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/slack"
 )
 
+// Presenter -
 type Presenter struct {
 	client interfaceSlack.Client
 	bot    *entitySlack.Bot
 	body   *entity.APIGateWayRequestBody
 }
 
+// NewPresenter -
 func NewPresenter(body *entity.APIGateWayRequestBody) (interfaces.Presenter, error) {
 	presenter := Presenter{}
 	bot, err := config.SharedConfig.NewBotInfo(body.APIAppID)
@@ -31,6 +33,7 @@ func NewPresenter(body *entity.APIGateWayRequestBody) (interfaces.Presenter, err
 	return &presenter, nil
 }
 
+// ShowResult -
 func (p *Presenter) ShowResult(attachments *[]*entitySlack.Attachment) {
 	requestBody := p.makeSlackRequestBody()
 	requestBody.Attachments = *attachments
@@ -38,6 +41,7 @@ func (p *Presenter) ShowResult(attachments *[]*entitySlack.Attachment) {
 	p.client.Notify(requestBody)
 }
 
+// ShowError -
 func (p *Presenter) ShowError(err error) {
 	requestBody := p.makeSlackRequestBody()
 	attachments := append([]*entitySlack.Attachment{}, &entitySlack.Attachment{Color: "danger", Title: "[ERROR]", Text: err.Error()})

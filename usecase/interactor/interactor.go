@@ -7,14 +7,17 @@ import (
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
 )
 
+// Interactor
 type Interactor struct {
 	presenter interfaces.Presenter
 }
 
+// NewInteractor
 func NewInteractor(presenter interfaces.Presenter) *Interactor {
 	return &Interactor{presenter: presenter}
 }
 
+// ExecProgram
 func (i *Interactor) ExecProgram(language string, text string) error {
 	// parse program
 	program, err := parsetext.Parse(text)
