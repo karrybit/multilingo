@@ -34,9 +34,3 @@ func (i *Interactor) ExecProgram(language string, text string) error {
 
 	return nil
 }
-
-func (i *Interactor) Challenge() {
-}
-
-func (i *Interactor) Kick() {
-}

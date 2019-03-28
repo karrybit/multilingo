@@ -36,13 +36,3 @@ func (c *Controller) ExecProgram() error {
 
 	return c.useCase.ExecProgram(bot.Language, c.body.Event.Text)
 }
-
-// Challenge is to validate token
-func (c *Controller) Challenge() {
-	c.useCase.Challenge()
-}
-
-// Kick is to kick corresponding to bot
-func (c *Controller) Kick() {
-	c.useCase.Kick()
-}

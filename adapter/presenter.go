@@ -38,12 +38,6 @@ func (p *Presenter) ShowResult(attachments *[]*entitySlack.Attachment) {
 	p.client.Notify(requestBody)
 }
 
-func (p *Presenter) Challenge() {
-}
-
-func (p *Presenter) LeaveChannel() {
-}
-
 func (p *Presenter) ShowError(err error) {
 	requestBody := p.makeSlackRequestBody()
 	attachments := append([]*entitySlack.Attachment{}, &entitySlack.Attachment{Color: "danger", Title: "[ERROR]", Text: err.Error()})
