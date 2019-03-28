@@ -2,11 +2,11 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
 	"github.com/TakumiKaribe/multilingo/entity/slack"
+	"github.com/TakumiKaribe/multilingo/logger"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
@@ -127,7 +127,7 @@ func Load() error {
 	if b, _ := strconv.ParseBool(os.Getenv("DEBUG")); b {
 		err := godotenv.Load()
 		if err != nil {
-			log.Fatal("Error loading .env file")
+			logger.Log.Fatal("Error loading .env file")
 		}
 	}
 

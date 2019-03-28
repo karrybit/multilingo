@@ -7,19 +7,16 @@ import (
 	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/TakumiKaribe/multilingo/entity/config"
 	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	log "github.com/sirupsen/logrus"
+	"github.com/TakumiKaribe/multilingo/logger"
 )
 
 // ExecDebug -
 func ExecDebug() {
-	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.JSONFormatter{})
-
 	// init dummy
 	flag.Parse()
 	token, appID, err := switchLanguage()
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Fatal(err)
 	}
 	event := entity.Event{Text: "<@debug>```" + flag.Arg(0) + "```", Channel: os.Getenv("CHANNEL")}
 	requestBody := entity.APIGateWayRequestBody{Token: token, APIAppID: appID, Event: event}

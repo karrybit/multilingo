@@ -3,8 +3,8 @@ package application
 import (
 	"github.com/TakumiKaribe/multilingo/adapter"
 	"github.com/TakumiKaribe/multilingo/entity"
+	"github.com/TakumiKaribe/multilingo/logger"
 	"github.com/aws/aws-lambda-go/events"
-	log "github.com/sirupsen/logrus"
 )
 
 func run(requestBody *entity.APIGateWayRequestBody) (events.APIGatewayProxyResponse, error) {
@@ -16,13 +16,13 @@ func run(requestBody *entity.APIGateWayRequestBody) (events.APIGatewayProxyRespo
 
 	controller, err := adapter.NewController(requestBody)
 	if err != nil {
-		log.Warn(err.Error())
+		logger.Log.Warn(err.Error())
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
 
 	err = controller.ExecProgram()
 	if err != nil {
-		log.Warn(err.Error())
+		logger.Log.Warn(err.Error())
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
 

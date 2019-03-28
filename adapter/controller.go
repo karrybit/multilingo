@@ -3,9 +3,9 @@ package adapter
 import (
 	"github.com/TakumiKaribe/multilingo/entity"
 	"github.com/TakumiKaribe/multilingo/entity/config"
+	"github.com/TakumiKaribe/multilingo/logger"
 	"github.com/TakumiKaribe/multilingo/usecase/interactor"
 	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
-	log "github.com/sirupsen/logrus"
 )
 
 // Controller is controller by clean architecture
@@ -19,7 +19,7 @@ func NewController(requestBody *entity.APIGateWayRequestBody) (*Controller, erro
 	presenter, err := NewPresenter(requestBody)
 	if err != nil {
 		// TODO: use multilingo error
-		log.Warn(err.Error())
+		logger.Log.Warn(err.Error())
 		return nil, err
 	}
 	return &Controller{body: requestBody, useCase: interactor.NewInteractor(presenter)}, nil
@@ -30,7 +30,7 @@ func (c *Controller) ExecProgram() error {
 	// init bot_info
 	bot, err := config.SharedConfig.NewBotInfo(c.body.APIAppID)
 	if err != nil {
-		log.Warn(err.Error())
+		logger.Log.Warn(err.Error())
 		return err
 	}
 
