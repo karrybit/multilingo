@@ -1,6 +1,7 @@
 package parsetext
 
 import (
+	"html"
 	"regexp"
 
 	"github.com/pkg/errors"
@@ -15,6 +16,6 @@ func Parse(text string) (program string, err error) {
 		err = errors.New("failed to parse post messages")
 		return
 	}
-	program = param[1]
+	program = html.UnescapeString(param[1])
 	return
 }
