@@ -1,10 +1,10 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
+	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
 	"github.com/TakumiKaribe/multilingo/entity/slack"
 	"github.com/TakumiKaribe/multilingo/logger"
 	"github.com/joho/godotenv"
@@ -160,6 +160,6 @@ func (c *config) NewBotInfo(id string) (*slack.Bot, error) {
 	case c.PythonAppID:
 		return &slack.Bot{Name: "Python", Token: c.PythonOauthToken, Language: "python3"}, nil
 	default:
-		return nil, fmt.Errorf("No bot corresponding to %s was found", id)
+		return nil, multilingoerror.New(multilingoerror.NewBotCorrespondingToID, id, "")
 	}
 }

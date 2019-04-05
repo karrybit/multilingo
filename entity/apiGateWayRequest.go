@@ -3,7 +3,7 @@ package entity
 import (
 	"encoding/json"
 
-	"github.com/pkg/errors"
+	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
 )
 
 // APIGateWayRequestBody -
@@ -31,7 +31,7 @@ func NewAPIGateWayRequestBody(bytes []byte) (*APIGateWayRequestBody, error) {
 	var request APIGateWayRequestBody
 	err := json.Unmarshal(bytes, &request)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed unmarshal APIGateWayRequestBody")
+		return nil, multilingoerror.Wrap(multilingoerror.DecodeAPIGateWayRequest, err)
 	}
 	return &request, nil
 }

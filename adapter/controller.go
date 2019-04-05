@@ -18,7 +18,6 @@ type Controller struct {
 func NewController(requestBody *entity.APIGateWayRequestBody) (*Controller, error) {
 	presenter, err := NewPresenter(requestBody)
 	if err != nil {
-		// TODO: use multilingo error
 		logger.Log.Warn(err.Error())
 		return nil, err
 	}
