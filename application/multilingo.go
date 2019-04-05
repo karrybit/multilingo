@@ -16,8 +16,8 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
 	}
 
-	logger.Log.Debugf("Header: %+v\n", apiRequest.Headers)
-	logger.Log.Debugf("Body: %+v\n", apiRequest.Body)
+	logger.Log.Infof("Header: %+v\n", apiRequest.Headers)
+	logger.Log.Infof("Body: %+v\n", apiRequest.Body)
 
 	// decode request
 	requestBody, err := entity.NewAPIGateWayRequestBody([]byte(apiRequest.Body))
