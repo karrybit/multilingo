@@ -26,17 +26,17 @@ type message struct {
 	status status
 	output string
 	time   string
-	memory int
 }
 
 func (m *message) build() string {
-	text := fmt.Sprintf("time: %s sec.\nmemory used: %d bytes", m.time, m.memory)
+	text := fmt.Sprintf("time: %s sec", m.time)
 	if len(m.output) > 0 {
-		text += fmt.Sprintf("\nlog:\n```%s```", m.output)
+		text += fmt.Sprintf("\n```%s```", m.output)
 	}
 	return text
 }
 
+// MakeMessage -
 func MakeMessage(result *paiza.Result) *[]*slack.Attachment {
 	var attachments []*slack.Attachment
 
@@ -52,7 +52,7 @@ func MakeMessage(result *paiza.Result) *[]*slack.Attachment {
 
 func makeExecResultAttachment(result *paiza.Result) *slack.Attachment {
 	attachment := slack.Attachment{Title: fmt.Sprintf("[EXEC %s]", strings.ToUpper(result.Result))}
-	message := message{status: status(result.Result), time: result.Time, memory: result.Memory}
+	message := message{status: status(result.Result), time: result.Time}
 
 	if message.status == isSuccess {
 		message.output = result.Stdout
@@ -75,7 +75,7 @@ func makeBuildResultAttachment(result *paiza.Result) *[]*slack.Attachment {
 	var attachments []*slack.Attachment
 
 	attachment := slack.Attachment{Title: fmt.Sprintf("[BUILD %s]", strings.ToUpper(result.BuildResult))}
-	message := message{status: status(result.BuildResult), time: result.BuildTime, memory: result.BuildMemory}
+	message := message{status: status(result.BuildResult), time: result.BuildTime}
 
 	if message.status == isSuccess {
 		message.output = result.BuildStdout
