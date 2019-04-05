@@ -4,3 +4,4 @@ app
 *.zip
 multilingo
 .env
+debug/
