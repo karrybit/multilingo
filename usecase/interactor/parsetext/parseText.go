@@ -1,21 +1,43 @@
 package parsetext
 
 import (
-	"html"
 	"regexp"
+	"strings"
 
 	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
 )
 
-var regex = regexp.MustCompile(`(?s)^.*<@.*>.*\x60\x60\x60(.*)\x60\x60\x60.*$`)
+var (
+	regex  = regexp.MustCompile(`.+?(?:\x60\x60\x60(.*?)\x60\x60\x60){1,2}`)
+	regex2 = regexp.MustCompile(`\x60\x60\x60(.*?)\x60\x60\x60`)
+
+	replace  = strings.NewReplacer("\n", "\\n", "\r", "\\n", "\r\n", "\\n")
+	replace2 = strings.NewReplacer("\\n", "\n")
+)
 
 // Parse -
-func Parse(text string) (program string, err error) {
-	param := regex.FindStringSubmatch(text)
-	if len(param) != 2 {
-		err = multilingoerror.New(multilingoerror.ParseProgram, "", "")
-		return
+func Parse(text string) (input string, program string, err error) {
+	text = replace.Replace(text)
+
+	var str []string
+
+	for _, match := range regex.FindAllString(text, -1) {
+		for _, match2 := range regex2.FindStringSubmatch(match) {
+			match2 = replace2.Replace(match2)
+			str = append(str, match2)
+		}
 	}
-	program = html.UnescapeString(param[1])
+
+	if len(str) == 2 {
+		program = str[1]
+
+	} else if len(str) == 4 {
+		input = str[1]
+		program = str[3]
+
+	} else {
+		err = multilingoerror.New(multilingoerror.ParseProgram, "", "")
+	}
+
 	return
 }
