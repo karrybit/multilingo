@@ -21,7 +21,7 @@ func NewInteractor(presenter interfaces.Presenter) *Interactor {
 // ExecProgram -
 func (i *Interactor) ExecProgram(language string, text string) error {
 	// parse program
-	program, err := parsetext.Parse(text)
+	input, program, err := parsetext.Parse(text)
 	if err != nil {
 		i.presenter.ShowError(err)
 		logger.Log.Warn(err)
@@ -29,7 +29,7 @@ func (i *Interactor) ExecProgram(language string, text string) error {
 	}
 
 	client := paiza.NewClient()
-	result, err := client.Request(language, program)
+	result, err := client.Request(input, language, program)
 	if err != nil {
 		i.presenter.ShowError(err)
 		return err

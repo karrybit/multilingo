@@ -37,8 +37,8 @@ func NewClient() requestPaiza.Client {
 }
 
 // Request -
-func (c *client) Request(language string, program string) (*paiza.Result, error) {
-	status, err := c.create(language, program)
+func (c *client) Request(input string, language string, program string) (*paiza.Result, error) {
+	status, err := c.create(input, language, program)
 	if err != nil {
 		logger.Log.Warn(multilingoerror.Wrap(multilingoerror.FailedPaizaCreateRequest, err))
 		return nil, err
@@ -55,10 +55,11 @@ func (c *client) Request(language string, program string) (*paiza.Result, error)
 	return c.getDetail(status.ID)
 }
 
-func (c *client) create(language string, program string) (*paiza.Status, error) {
+func (c *client) create(input string, language string, program string) (*paiza.Status, error) {
 	params := c.defaultParams
 	params.Add("language", language)
 	params.Add("source_code", program)
+	params.Add("input", input)
 
 	urlString := strings.Join([]string{c.baseURL.String(), create, params.Encode()}, "")
 

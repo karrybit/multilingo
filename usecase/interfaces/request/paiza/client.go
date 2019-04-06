@@ -4,6 +4,7 @@ import (
 	"github.com/TakumiKaribe/multilingo/entity/paiza"
 )
 
+// Client -
 type Client interface {
-	Request(string, string) (*paiza.Result, error)
+	Request(string, string, string) (*paiza.Result, error)
 }
