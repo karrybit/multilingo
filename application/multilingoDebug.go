@@ -18,14 +18,14 @@ func ExecDebug() {
 	if err != nil {
 		logger.Log.Fatal(err)
 	}
-	event := entity.Event{Text: "<@debug>```" + flag.Arg(0) + "```", Channel: os.Getenv("CHANNEL")}
+	event := entity.Event{Text: flag.Arg(1), Channel: os.Getenv("CHANNEL")}
 	requestBody := entity.APIGateWayRequestBody{Token: token, APIAppID: appID, Event: event}
 
 	run(&requestBody)
 }
 
 func switchLanguage() (string, string, error) {
-	arg := flag.Arg(1)
+	arg := flag.Arg(0)
 	switch arg {
 	case "swift":
 		return config.SharedConfig.DebugConfig.SwiftVerificationToken, config.SharedConfig.SwiftAppID, nil
