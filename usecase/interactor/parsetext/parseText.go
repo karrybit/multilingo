@@ -12,18 +12,17 @@ var (
 	regex2 = regexp.MustCompile(`\x60\x60\x60(.*?)\x60\x60\x60`)
 
 	replace  = strings.NewReplacer("\n", "\\n", "\r", "\\n", "\r\n", "\\n")
-	replace2 = strings.NewReplacer("\\n", "\n")
+	replace2 = strings.NewReplacer("\\\\n", "\n", "\\\\t", "\t")
 )
 
 // Parse -
 func Parse(text string) (input string, program string, err error) {
-	text = replace.Replace(text)
-
 	var str []string
 
 	for _, match := range regex.FindAllString(text, -1) {
 		for _, match2 := range regex2.FindStringSubmatch(match) {
 			match2 = replace2.Replace(match2)
+			match2 = strings.Trim(match2, "\n")
 			str = append(str, match2)
 		}
 	}
