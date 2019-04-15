@@ -23,7 +23,7 @@ func LambdaHandler(ctx context.Context, apiRequest events.APIGatewayProxyRequest
 	requestBody, err := entity.NewAPIGateWayRequestBody([]byte(apiRequest.Body))
 	if err != nil {
 		logger.Log.Warnf("err: %v\n", err)
-		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 200}, nil
+		return events.APIGatewayProxyResponse{Body: apiRequest.Body, StatusCode: 500}, nil
 	}
 
 	return run(requestBody)
