@@ -5,6 +5,7 @@ export DEBUG=true
 case $1 in
     "swift" )
         ONLY_EXECUTE=$(<./debug/swift/input_only_execute.txt)
+        ONLY_EXECUTE_DOUBLE_SLASH=$(<./debug/swift/input_only_execute_double_slash.txt)
         WITH_ARGS=$(<./debug/swift/input_with_args.txt)
     ;;
     "python" )
@@ -14,4 +15,5 @@ case $1 in
 esac
 
 ./app $1 "${ONLY_EXECUTE}"
+./app $1 "${ONLY_EXECUTE_DOUBLE_SLASH}"
 ./app $1 "${WITH_ARGS}"
