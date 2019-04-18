@@ -5,23 +5,25 @@ import (
 	"strings"
 
 	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
+	"github.com/TakumiKaribe/multilingo/logger"
 )
 
 var (
-	regex  = regexp.MustCompile(`.+?(?:\x60\x60\x60(.*?)\x60\x60\x60){1,2}`)
-	regex2 = regexp.MustCompile(`\x60\x60\x60(.*?)\x60\x60\x60`)
-
-	replace  = strings.NewReplacer("\n", "\\n", "\r", "\\n", "\r\n", "\\n")
-	replace2 = strings.NewReplacer("\\\\n", "\n", "\\\\t", "\t")
+	regex         = regexp.MustCompile(`.+?(?:\x60\x60\x60(.*?)\x60\x60\x60){1,2}`)
+	regex2        = regexp.MustCompile(`\x60\x60\x60(.*?)\x60\x60\x60`)
+	regexReplaceN = regexp.MustCompile(`\\(\\*)n`)
+	regexReplaceT = regexp.MustCompile(`\\(\\*)t`)
 )
 
 // Parse -
 func Parse(text string) (input string, program string, err error) {
 	var str []string
 
+	logger.Log.Infof("text: %s\n", text)
 	for _, match := range regex.FindAllString(text, -1) {
 		for _, match2 := range regex2.FindStringSubmatch(match) {
-			match2 = replace2.Replace(match2)
+			match2 = regexReplaceN.ReplaceAllString(match2, "\n")
+			match2 = regexReplaceT.ReplaceAllString(match2, "\t")
 			match2 = strings.Trim(match2, "\n")
 			str = append(str, match2)
 		}
