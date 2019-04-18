@@ -1,6 +1,8 @@
 github.com/TakumiKaribe/MultilinGo v0.0.0-20190312054036-c5eddf59fe47 h1:yeziSbieveL+/HfnfFI48V+xcBiPM2LESZ/pJAxAX6Q=
 github.com/aws/aws-lambda-go v1.8.2 h1:wC8KcAG9HyVkFjbKQ9uhp87UGZutlPn9IJPq9fYM2BQ=
 github.com/aws/aws-lambda-go v1.8.2/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
+github.com/aws/aws-lambda-go v1.10.0 h1:uafgdfYGQD0UeT7d2uKdyWW8j/ZYRifRPIdmeqLzLCk=
+github.com/aws/aws-lambda-go v1.10.0/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/pprof v0.0.0-20190228041337-2ef8d84b2e3c h1:hqIMb/MbwYamune8FA5YtFAVzfTE8OXRtg9Nf0rzmqo=

@@ -1,7 +1,7 @@
 module github.com/TakumiKaribe/multilingo
 
 require (
-	github.com/aws/aws-lambda-go v1.8.2
+	github.com/aws/aws-lambda-go v1.10.0
 	github.com/google/pprof v0.0.0-20190228041337-2ef8d84b2e3c // indirect
 	github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6 // indirect
 	github.com/joho/godotenv v1.3.0
