@@ -1,1 +1,1 @@
-<@swift>\\n```func hoge() -> Int {\\n\\treturn 114514\\n}\\n\\nprint(hoge())\\n```
+<@swift>\n```func hoge() -> Int {\n\treturn 114514\n}\n\nprint(hoge())\n```
