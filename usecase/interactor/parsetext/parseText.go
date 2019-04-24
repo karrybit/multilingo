@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	regex         = regexp.MustCompile(`.+?(?:\x60\x60\x60(.*?)\x60\x60\x60){1,2}`)
-	regex2        = regexp.MustCompile(`\x60\x60\x60(.*?)\x60\x60\x60`)
+	regex         = regexp.MustCompile(`(?s)(?:\x60\x60\x60(.*?)\x60\x60\x60){1,2}`)
+	regex2        = regexp.MustCompile(`(?s)\x60\x60\x60(.*)\x60\x60\x60{1,2}`)
 	regexReplaceN = regexp.MustCompile(`\\(\\*)n`)
 	regexReplaceT = regexp.MustCompile(`\\(\\*)t`)
 )
