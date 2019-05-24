@@ -169,7 +169,7 @@ func (c *config) NewBotInfo(id string) (*slack.Bot, error) {
 	case c.KotlinAppID:
 		return &slack.Bot{Name: "Kotlin", Token: c.KotlinOauthToken, Language: "kotlin"}, nil
 	case c.ScalaAppID:
-		return &slack.Bot{Name: "Scala", Token: c.KotlinOauthToken, Language: "scala"}, nil
+		return &slack.Bot{Name: "Scala", Token: c.ScalaOauthToken, Language: "scala"}, nil
 	case c.SwiftAppID:
 		return &slack.Bot{Name: "Swift", Token: c.SwiftOauthToken, Language: "swift"}, nil
 	case c.CSharpAppID:
@@ -179,43 +179,43 @@ func (c *config) NewBotInfo(id string) (*slack.Bot, error) {
 	case c.HaskellAppID:
 		return &slack.Bot{Name: "Haskell", Token: c.HaskellOauthToken, Language: "haskell"}, nil
 	case c.ErlangAppID:
-		return &slack.Bot{Name: "Erlang", Token: c.HaskellOauthToken, Language: "erlang"}, nil
+		return &slack.Bot{Name: "Erlang", Token: c.ErlangOauthToken, Language: "erlang"}, nil
 	case c.PerlAppID:
-		return &slack.Bot{Name: "Perl", Token: c.HaskellOauthToken, Language: "perl"}, nil
+		return &slack.Bot{Name: "Perl", Token: c.PerlOauthToken, Language: "perl"}, nil
 	case c.PythonAppID:
 		return &slack.Bot{Name: "Python", Token: c.PythonOauthToken, Language: "python3"}, nil
 	case c.RubyAppID:
-		return &slack.Bot{Name: "Ruby", Token: c.PythonOauthToken, Language: "ruby"}, nil
+		return &slack.Bot{Name: "Ruby", Token: c.RubyOauthToken, Language: "ruby"}, nil
 	case c.PhpAppID:
-		return &slack.Bot{Name: "PHP", Token: c.PythonOauthToken, Language: "php"}, nil
+		return &slack.Bot{Name: "PHP", Token: c.PhpOauthToken, Language: "php"}, nil
 	case c.BashAppID:
-		return &slack.Bot{Name: "Bash", Token: c.PythonOauthToken, Language: "bash"}, nil
+		return &slack.Bot{Name: "Bash", Token: c.BashOauthToken, Language: "bash"}, nil
 	case c.RAppID:
-		return &slack.Bot{Name: "R", Token: c.PythonOauthToken, Language: "r"}, nil
+		return &slack.Bot{Name: "R", Token: c.ROauthToken, Language: "r"}, nil
 	case c.JavaScriptAppID:
-		return &slack.Bot{Name: "JavaScript", Token: c.PythonOauthToken, Language: "javascript"}, nil
+		return &slack.Bot{Name: "JavaScript", Token: c.JavaScriptOauthToken, Language: "javascript"}, nil
 	case c.CoffeeScriptAppID:
-		return &slack.Bot{Name: "CoffeeScript", Token: c.PythonOauthToken, Language: "coffeescript"}, nil
+		return &slack.Bot{Name: "CoffeeScript", Token: c.CoffeeScriptOauthToken, Language: "coffeescript"}, nil
 	case c.VbAppID:
-		return &slack.Bot{Name: "VB", Token: c.PythonOauthToken, Language: "vb"}, nil
+		return &slack.Bot{Name: "VB", Token: c.VbOauthToken, Language: "vb"}, nil
 	case c.CobolAppID:
-		return &slack.Bot{Name: "COBOL", Token: c.PythonOauthToken, Language: "cobol"}, nil
+		return &slack.Bot{Name: "COBOL", Token: c.CobolOauthToken, Language: "cobol"}, nil
 	case c.FSharpAppID:
-		return &slack.Bot{Name: "Fsharp", Token: c.PythonOauthToken, Language: "fsharp"}, nil
+		return &slack.Bot{Name: "Fsharp", Token: c.FSharpOauthToken, Language: "fsharp"}, nil
 	case c.DAppID:
-		return &slack.Bot{Name: "D", Token: c.PythonOauthToken, Language: "d"}, nil
+		return &slack.Bot{Name: "D", Token: c.DOauthToken, Language: "d"}, nil
 	case c.ClojureAppID:
-		return &slack.Bot{Name: "Clojure", Token: c.PythonOauthToken, Language: "clojure"}, nil
+		return &slack.Bot{Name: "Clojure", Token: c.ClojureOauthToken, Language: "clojure"}, nil
 	case c.ElixierAppID:
-		return &slack.Bot{Name: "Elixier", Token: c.PythonOauthToken, Language: "elixier"}, nil
+		return &slack.Bot{Name: "Elixier", Token: c.ElixierOauthToken, Language: "elixier"}, nil
 	case c.MysqlAppID:
-		return &slack.Bot{Name: "MySQL", Token: c.PythonOauthToken, Language: "mysql"}, nil
+		return &slack.Bot{Name: "MySQL", Token: c.MysqlOauthToken, Language: "mysql"}, nil
 	case c.RustAppID:
-		return &slack.Bot{Name: "Rust", Token: c.PythonOauthToken, Language: "rust"}, nil
+		return &slack.Bot{Name: "Rust", Token: c.RustOauthToken, Language: "rust"}, nil
 	case c.SchemeAppID:
-		return &slack.Bot{Name: "Scheme", Token: c.PythonOauthToken, Language: "scheme"}, nil
+		return &slack.Bot{Name: "Scheme", Token: c.SchemeOauthToken, Language: "scheme"}, nil
 	case c.CommonLispAppID:
-		return &slack.Bot{Name: "CommonLisp", Token: c.PythonOauthToken, Language: "commonlisp"}, nil
+		return &slack.Bot{Name: "CommonLisp", Token: c.CommonLispOauthToken, Language: "commonlisp"}, nil
 
 	default:
 		return nil, multilingoerror.New(multilingoerror.NewBotCorrespondingToID, id, "")
