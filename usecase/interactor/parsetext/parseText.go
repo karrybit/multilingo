@@ -1,6 +1,7 @@
 package parsetext
 
 import (
+	"html"
 	"regexp"
 	"strings"
 
@@ -30,11 +31,11 @@ func Parse(text string) (input string, program string, err error) {
 	}
 
 	if len(str) == 2 {
-		program = str[1]
+		program = html.UnescapeString(str[1])
 
 	} else if len(str) == 4 {
-		input = str[1]
-		program = str[3]
+		input = html.UnescapeString(str[1])
+		program = html.UnescapeString(str[3])
 
 	} else {
 		err = multilingoerror.New(multilingoerror.ParseProgram, "", "")
