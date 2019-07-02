@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/entity/multilingoerror"
+	"multilingo/logger"
 
-	interfacesRequest "github.com/TakumiKaribe/multilingo/usecase/interfaces/request"
+	interfacesRequest "multilingo/usecase/interfaces/request"
 )
 
 // Reqeuster -

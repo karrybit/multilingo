@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/TakumiKaribe/multilingo/entity/slack"
+import "multilingo/entity/slack"
 
 // Presenter -
 type Presenter interface {

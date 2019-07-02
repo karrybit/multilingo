@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/TakumiKaribe/multilingo/application"
-	"github.com/TakumiKaribe/multilingo/entity/config"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/application"
+	"multilingo/entity/config"
+	"multilingo/logger"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 

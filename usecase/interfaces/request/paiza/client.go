@@ -1,7 +1,7 @@
 package paiza
 
 import (
-	"github.com/TakumiKaribe/multilingo/entity/paiza"
+	"multilingo/entity/paiza"
 )
 
 // Client -

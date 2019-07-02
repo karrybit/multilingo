@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TakumiKaribe/multilingo/entity/paiza"
-	"github.com/TakumiKaribe/multilingo/entity/slack"
+	"multilingo/entity/paiza"
+	"multilingo/entity/slack"
 )
 
 type status string

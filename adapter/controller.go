@@ -1,11 +1,11 @@
 package adapter
 
 import (
-	"github.com/TakumiKaribe/multilingo/entity"
-	"github.com/TakumiKaribe/multilingo/entity/config"
-	"github.com/TakumiKaribe/multilingo/logger"
-	"github.com/TakumiKaribe/multilingo/usecase/interactor"
-	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
+	"multilingo/entity"
+	"multilingo/entity/config"
+	"multilingo/logger"
+	"multilingo/usecase/interactor"
+	"multilingo/usecase/interfaces"
 )
 
 // Controller is controller by clean architecture

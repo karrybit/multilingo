@@ -4,9 +4,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	"github.com/TakumiKaribe/multilingo/entity/slack"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/entity/multilingoerror"
+	"multilingo/entity/slack"
+	"multilingo/logger"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )

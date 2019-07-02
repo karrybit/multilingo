@@ -3,7 +3,7 @@ package entity
 import (
 	"encoding/json"
 
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
+	"multilingo/entity/multilingoerror"
 )
 
 // APIGateWayRequestBody -

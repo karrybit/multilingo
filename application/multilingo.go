@@ -3,8 +3,8 @@ package application
 import (
 	"context"
 
-	"github.com/TakumiKaribe/multilingo/entity"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/entity"
+	"multilingo/logger"
 	"github.com/aws/aws-lambda-go/events"
 )
 

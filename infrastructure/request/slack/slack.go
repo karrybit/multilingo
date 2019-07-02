@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"net/url"
 
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	"github.com/TakumiKaribe/multilingo/entity/slack"
-	infraRequest "github.com/TakumiKaribe/multilingo/infrastructure/request"
-	"github.com/TakumiKaribe/multilingo/logger"
-	interfacesRequest "github.com/TakumiKaribe/multilingo/usecase/interfaces/request"
-	requestSlack "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/slack"
+	"multilingo/entity/multilingoerror"
+	"multilingo/entity/slack"
+	infraRequest "multilingo/infrastructure/request"
+	"multilingo/logger"
+	interfacesRequest "multilingo/usecase/interfaces/request"
+	requestSlack "multilingo/usecase/interfaces/request/slack"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/entity/multilingoerror"
+	"multilingo/logger"
 )
 
 var (

@@ -1,4 +1,6 @@
 github.com/TakumiKaribe/MultilinGo v0.0.0-20190312054036-c5eddf59fe47 h1:yeziSbieveL+/HfnfFI48V+xcBiPM2LESZ/pJAxAX6Q=
+github.com/TakumiKaribe/multilingo v0.0.0-20190702043609-2617c71cdcc2 h1:VWkIUY2o+0D7hXxsb/HFRQQZ3HoQil2XJT7nX2SBMa8=
+github.com/TakumiKaribe/multilingo v0.0.0-20190702043609-2617c71cdcc2/go.mod h1:6BHs8RY2H2R21rIg2Fg3UcX5LJXxB3VHSeap9KXPH1o=
 github.com/aws/aws-lambda-go v1.8.2 h1:wC8KcAG9HyVkFjbKQ9uhp87UGZutlPn9IJPq9fYM2BQ=
 github.com/aws/aws-lambda-go v1.8.2/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
 github.com/aws/aws-lambda-go v1.10.0 h1:uafgdfYGQD0UeT7d2uKdyWW8j/ZYRifRPIdmeqLzLCk=

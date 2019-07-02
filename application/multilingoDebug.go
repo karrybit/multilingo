@@ -4,10 +4,10 @@ import (
 	"flag"
 	"os"
 
-	"github.com/TakumiKaribe/multilingo/entity"
-	"github.com/TakumiKaribe/multilingo/entity/config"
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/entity"
+	"multilingo/entity/config"
+	"multilingo/entity/multilingoerror"
+	"multilingo/logger"
 )
 
 // ExecDebug -

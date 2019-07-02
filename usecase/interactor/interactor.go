@@ -1,11 +1,11 @@
 package interactor
 
 import (
-	"github.com/TakumiKaribe/multilingo/infrastructure/request/paiza"
-	"github.com/TakumiKaribe/multilingo/logger"
-	"github.com/TakumiKaribe/multilingo/usecase/interactor/buildMessage"
-	"github.com/TakumiKaribe/multilingo/usecase/interactor/parsetext"
-	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
+	"multilingo/infrastructure/request/paiza"
+	"multilingo/logger"
+	"multilingo/usecase/interactor/buildMessage"
+	"multilingo/usecase/interactor/parsetext"
+	"multilingo/usecase/interfaces"
 )
 
 // Interactor -

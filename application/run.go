@@ -1,9 +1,9 @@
 package application
 
 import (
-	"github.com/TakumiKaribe/multilingo/adapter"
-	"github.com/TakumiKaribe/multilingo/entity"
-	"github.com/TakumiKaribe/multilingo/logger"
+	"multilingo/adapter"
+	"multilingo/entity"
+	"multilingo/logger"
 	"github.com/aws/aws-lambda-go/events"
 )
 

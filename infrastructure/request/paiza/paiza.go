@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TakumiKaribe/multilingo/entity/multilingoerror"
-	"github.com/TakumiKaribe/multilingo/entity/paiza"
-	infraRequest "github.com/TakumiKaribe/multilingo/infrastructure/request"
-	"github.com/TakumiKaribe/multilingo/logger"
-	interfacesRequest "github.com/TakumiKaribe/multilingo/usecase/interfaces/request"
-	requestPaiza "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/paiza"
+	"multilingo/entity/multilingoerror"
+	"multilingo/entity/paiza"
+	infraRequest "multilingo/infrastructure/request"
+	"multilingo/logger"
+	interfacesRequest "multilingo/usecase/interfaces/request"
+	requestPaiza "multilingo/usecase/interfaces/request/paiza"
 )
 
 const (

@@ -1,12 +1,12 @@
 package adapter
 
 import (
-	"github.com/TakumiKaribe/multilingo/entity"
-	"github.com/TakumiKaribe/multilingo/entity/config"
-	entitySlack "github.com/TakumiKaribe/multilingo/entity/slack"
-	requestSlack "github.com/TakumiKaribe/multilingo/infrastructure/request/slack"
-	"github.com/TakumiKaribe/multilingo/usecase/interfaces"
-	interfaceSlack "github.com/TakumiKaribe/multilingo/usecase/interfaces/request/slack"
+	"multilingo/entity"
+	"multilingo/entity/config"
+	entitySlack "multilingo/entity/slack"
+	requestSlack "multilingo/infrastructure/request/slack"
+	"multilingo/usecase/interfaces"
+	interfaceSlack "multilingo/usecase/interfaces/request/slack"
 )
 
 // Presenter -
